@@ -1,0 +1,17 @@
+# Python dependencies
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env
+
+# Logs
+logs/
+*.log
+
+certs/
+esdatadir/
+kibanadata/
+
+test.py
