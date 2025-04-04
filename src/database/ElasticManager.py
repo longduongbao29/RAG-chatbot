@@ -1,7 +1,8 @@
-from importlib import metadata
 from injector import inject
 from elasticsearch import Elasticsearch
 
+from src.embedding.EmbeddingModel import EmbeddingModel
+from src.embedding.HFEmbeddingModel import HFEmbeddingModel
 from src.config.config import Config
 from src.database.DbManager import DbManager
 from src.utils.logger import setup_logger
@@ -24,9 +25,9 @@ class ConnectionProvider:
         return elasticsearch
 class ElasticManager(DbManager):
     @inject
-    def __init__(self, elasticsearch: Elasticsearch):
+    def __init__(self, elasticsearch: Elasticsearch, embedding : EmbeddingModel):
         self.elasticsearch = elasticsearch
-
+        self.embedding = embedding
     def init_index(self, index_name: str):
         """
         Initialize an index in Elasticsearch.
@@ -35,17 +36,25 @@ class ElasticManager(DbManager):
         if not self.elasticsearch.indices.exists(index=index_name):
             self.elasticsearch.indices.create(
                     index=index_name,
+                    settings={
+                            "index": {
+                            "number_of_shards": 1,
+                            "number_of_replicas": 0
+                            }
+                        },
                     mappings={
                         "properties": {
                             "id": {
                                 "type": "text"
                             },
                             "content": {
-                                "type": "semantic_text",
-                                "inference_id": "embedding_inf"
+                                "type": "text"
+
                             },
-                           
-                            
+                            "dense_vector": {
+                                "type": "dense_vector",
+                                "dims": 768
+                            },           
                         }
                     },
                 )
@@ -63,7 +72,8 @@ class ElasticManager(DbManager):
         Index a document in Elasticsearch.
         """
         logger.info("Indexing document in Elasticsearch...")
-        response = self.elasticsearch.index(index=index_name, body=document)
+        document['dense_vector'] = self.embedding.embed(text=document['content'])
+        response = self.elasticsearch.index(index=index_name, document=document)
         logger.info("Document indexed with ID: %s", response['_id'])
         return response
     
@@ -76,11 +86,10 @@ class ElasticManager(DbManager):
         logger.info("Search results: %s", response['hits']['hits'])
         return response['hits']['hits']
     
-    def fulltext_search(self, index_name: str, query: str):
+    def fulltext_search(self, index_name: str, query: str, num_results: int = 5)-> list[dict]:
         """
         Perform a full-text search in Elasticsearch.
         """
-        logger.info("Performing full-text search in Elasticsearch...")
         body = {
             "query": {
                 "match": {
@@ -89,14 +98,17 @@ class ElasticManager(DbManager):
             }
         }
         response = self.elasticsearch.search(index=index_name, body=body)
-        logger.info("Full-text search results: %s", response['hits']['hits'])
-        return response['hits']['hits']
+        return response['hits']['hits'][:num_results]
     
-    def semantic_search(self, index_name: str, query_vector: list):
+    def semantic_search(self, index_name: str, query: str, num_results: int = 5)-> list[dict]:
         """
         Perform a semantic search in Elasticsearch.
         """
-        logger.info("Performing semantic search in Elasticsearch...")
+        query_vector = self.embedding.embed(query)
+        if len(query_vector) != 768:
+            logger.error("Query vector dimensions do not match the expected dimensions (768).")
+            raise ValueError("Query vector dimensions mismatch.")
+
         body = {
             "query": {
                 "script_score": {
@@ -104,7 +116,7 @@ class ElasticManager(DbManager):
                         "match_all": {}
                     },
                     "script": {
-                        "source": "cosineSimilarity(params.query_vector, 'vector') + 1.0",
+                        "source": "cosineSimilarity(params.query_vector, 'dense_vector') + 1.0",
                         "params": {
                             "query_vector": query_vector
                         }
@@ -113,5 +125,9 @@ class ElasticManager(DbManager):
             }
         }
         response = self.elasticsearch.search(index=index_name, body=body)
-        logger.info("Semantic search results: %s", response['hits']['hits'])
-        return response['hits']['hits']
+        
+        # Log the results for debugging
+        # logger.info("Semantic search results: %s", response['hits']['hits'])
+        
+        # Return sorted results
+        return response['hits']['hits'][:num_results]

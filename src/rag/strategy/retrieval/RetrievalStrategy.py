@@ -2,14 +2,14 @@ from abc import ABC, abstractmethod
 from pydoc import doc
 
 
-from rag.strategy.retrieval.Document import Document
+from src.utils.Document import Document
 
 class RetrievalStrategy(ABC):
     """
     Abstract base class for retrieval strategies.
     """
     @abstractmethod
-    def retrieve(self, query):
+    def retrieve(self):
         """
         Retrieve documents based on the query.
         """
@@ -23,17 +23,15 @@ class RetrievalStrategy(ABC):
         
         for doc_list in doc_lists:
             for d in doc_list:
-                # Check if the document is already in the list
                 if any(d.id == doc[0].id for doc in docs_with_rank):
                     continue
-                # Calculate the rank using reciprocal rank fusion
                 rank = self.reciprocal_rank_fusion(d, 10, doc_lists)
                 docs_with_rank.append((d, rank))
-        # Sort the documents based on rank
-        docs_with_rank.sort(key=lambda x: x[1])
-        return docs_with_rank[:topk]
 
-    def rank_func(results, d):
+        docs_with_rank.sort(key=lambda x: x[1], reverse=True)
+        return [dwr[0] for dwr in docs_with_rank][:topk]
+
+    def rank_func(self,results:list[Document], d:Document):
         index = -1
         for i, doc in enumerate(results):
             if doc.id == d.id:

@@ -18,13 +18,17 @@ class LangchainGroqLLM(LLM):
         self.llm = ChatGroq(api_key=config.GROQ_API_KEY,
                             model_name = config.MODEL_NAME,
                             temperature=config.TEMPERATURE)
-    def generate(self, query: str, prompt: PromptTemplate) -> str:
+    def generate(self, input: str,) -> str:
         """
         Generate text based on the provided prompt.
         """
         try:
-            chain = prompt | self.llm
-            output = chain.invoke({"input": query})
+            output = self.llm.invoke(input)
         except (Exception) as e:
             logger.error(f"Error in Groq LLM: {e}")
         return output.content
+    def get_llm(self):
+        """
+        Get the LLM instance.
+        """
+        return self.llm

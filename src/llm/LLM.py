@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from langchain_core.language_models.chat_models import BaseChatModel
 
 class LLM(ABC):
     """
@@ -8,9 +8,14 @@ class LLM(ABC):
     model_name:str
     temperature:float
     @abstractmethod
-    def generate() -> str:
+    def generate(self) -> str:
         """
         Generate text based on the provided prompt.
         """
         pass
-
+    @abstractmethod
+    def get_llm(self)->BaseChatModel:
+        """
+        Get the LLM instance.
+        """
+        pass

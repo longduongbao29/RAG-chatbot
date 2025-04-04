@@ -1,14 +1,17 @@
-from abc import ABC
+from abc import abstractmethod
 
-from src.database.DbManager import DbManager
 from src.rag.strategy.retrieval.RetrievalStrategy import RetrievalStrategy
 
-class VectorSearch(RetrievalStrategy, ABC):
+class VectorSearch(RetrievalStrategy):
     """
     Vector search strategy for document retrieval.
     """
-    
-    def __init__(self, db_manager: DbManager):
-        self.db_manager = db_manager
+        
+    @abstractmethod
+    def retrieve(self, query: str):
+        """
+        Retrieve documents based on the query.
+        """
+        pass
     
     

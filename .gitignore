@@ -13,5 +13,9 @@ logs/
 certs/
 esdatadir/
 kibanadata/
+ca.crt
 
-test.py
+test/
+
+.vscode/
+

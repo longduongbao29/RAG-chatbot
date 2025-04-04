@@ -15,3 +15,6 @@ class Config():
     GROQ_API_KEY = os.getenv("GROQ_API_KEY","")
     MODEL_NAME = os.getenv("MODEL_NAME","llama-3.3-70b-versatile")
     TEMPERATURE = os.getenv("TEMPERATURE",0.5)
+    
+    #EMBEDDING
+    EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME","sentence-transformers/all-mpnet-base-v2")
