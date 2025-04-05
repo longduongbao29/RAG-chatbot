@@ -1,4 +1,6 @@
+from re import search
 from injector import inject
+from langchain_core.tools.base import BaseTool
 from src.utils.Document import Document
 from src.database.DbManager import DbManager
 from src.rag.strategy.retrieval.Types import SearchStrategy
@@ -46,3 +48,30 @@ class ElasticVectorSearch(VectorSearch):
 
             return docs_results[:num_results]
     
+        
+class ElasticSearchTool(BaseTool):
+    
+    name:str = "elastic_search"
+    description:str = "Search information from Elastic database"
+    elastic_vector_search:ElasticVectorSearch = None
+    @inject
+    def __init__(self, elastic_vector_serach: ElasticVectorSearch):
+        super().__init__()
+        self.elastic_vector_search = elastic_vector_serach
+    def _run(self, **args):
+        index = args["index"]
+        query: str = args["query"]
+        translated_queries:list = args["translated_queries"]
+        search_type = args.get("search_type", SearchStrategy.HYBRID)
+        num_results = args.get("num_results", 5)
+        
+        queries:list = [query] + translated_queries
+        docs_retrieved = []
+        for q in queries:
+            docs_retrieved.append(self.elastic_vector_search.retrieve(index=index,
+                             query=q,
+                             search_type=search_type,
+                             num_results=num_results))
+        rerank_docs = self.elastic_vector_search.rerank(docs_retrieved)[:num_results]
+        context = "\n".join([doc.content for doc in rerank_docs])
+        return context

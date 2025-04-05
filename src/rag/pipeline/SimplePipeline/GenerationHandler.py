@@ -1,5 +1,5 @@
 from injector import inject
-from src.rag.pipeline.Handler import Handler
+from src.rag.pipeline.SimplePipeline.Handler import Handler
 from src.rag.strategy.generation.Generation import LLMGenerator
 from src.utils.Document import Document
 from src.utils.logger import setup_logger

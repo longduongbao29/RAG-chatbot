@@ -1,6 +1,5 @@
-
-from src.rag.strategy.retrieval.DuckDuckGo.DuckDuckGoSearch import DuckDuckGoSearch
-
-
-search = DuckDuckGoSearch()
-print(search.retrieve("Thời tiết hôm nay tại hà nội"))
+from src.dependency import injector
+from src.rag.pipeline.LangGraph.Graph import Graph
+instance = injector.get(Graph)
+while True:
+    print("AI: ",instance.run(input("User: ")))

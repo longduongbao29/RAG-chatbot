@@ -32,3 +32,4 @@ class LangchainGroqLLM(LLM):
         Get the LLM instance.
         """
         return self.llm
+    

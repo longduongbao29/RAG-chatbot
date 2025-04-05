@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 from langchain_core.language_models.chat_models import BaseChatModel
 
@@ -19,3 +20,16 @@ class LLM(ABC):
         Get the LLM instance.
         """
         pass
+    @classmethod
+    def remove_think_tags(cls,input_string:str):
+        """
+        Removes content within <think>...</think> tags from the input string.
+
+        Args:
+            input_string (str): The input string to process.
+
+        Returns:
+            str: The processed string with <think>...</think> content removed.
+        """
+        # Use regex to find and remove <think>...</think> and its content
+        return re.sub(r'<think>.*?</think>', '', input_string, flags=re.DOTALL).lstrip('\n')

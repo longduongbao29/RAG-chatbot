@@ -1,18 +1,13 @@
 
 from src.dependency import injector
 
-from src.rag.pipeline.Handler import Handler
-from src.rag.pipeline.QueryTranslationHandler import QueryTranslationHandler
-from src.rag.pipeline.RetrievalHandler import RetrievalHandler
-from src.rag.pipeline.GenerationHandler import GenerationHandler
+from src.rag.pipeline.SimplePipeline.Handler import Handler
+from src.rag.pipeline.SimplePipeline.QueryTranslationHandler import QueryTranslationHandler
+from src.rag.pipeline.SimplePipeline.RetrievalHandler import RetrievalHandler
+from src.rag.pipeline.SimplePipeline.GenerationHandler import GenerationHandler
 
 class Pipeline:
         
-    def run(self, query: str):
-        """
-        Run the Pineline.
-        """
-        return self.pineline.handle(query=query)
     def run_pipeline(self, query: str,index_name: str):
 
         query_translation_handler = injector.get(QueryTranslationHandler)

@@ -1,7 +1,7 @@
 from math import log
 from injector import inject
 from src.rag.strategy.query_translation.QueryTranslation import QueryTranslation
-from src.rag.pipeline.Handler import Handler
+from src.rag.pipeline.SimplePipeline.Handler import Handler
 from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
 class QueryTranslationHandler(Handler):

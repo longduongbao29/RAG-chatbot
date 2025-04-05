@@ -1,7 +1,7 @@
 from math import log
 from pydoc import doc
 from injector import inject
-from src.rag.pipeline.Handler import Handler
+from src.rag.pipeline.SimplePipeline.Handler import Handler
 from src.rag.strategy.retrieval.RetrievalStrategy import RetrievalStrategy
 from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
