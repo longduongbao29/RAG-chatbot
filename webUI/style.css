@@ -370,3 +370,35 @@ body.theme-dark .user-message .message-content {
 .input-area #clearChatBtn:hover {
     background: #c0392b;
 }
+/* Cập nhật style cho input trong phần cài đặt */
+.setting-group input[type="text"] {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.setting-group input[type="text"]:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+    /* Hiệu ứng focus đẹp mắt */
+    background-color: #fff;
+}
+
+.setting-group input[type="text"]::placeholder {
+    color: #888;
+    font-style: italic;
+}
+
+.setting-group input[type="text"]:hover {
+    border-color: #357ab8;
+}
+
+.setting-group input[type="text"]:active {
+    border-color: #357ab8;
+    background-color: #fff;
+}

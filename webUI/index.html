@@ -8,7 +8,9 @@
   <!-- Font Google và FontAwesome -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="icon" href="assistant.png" type="image/png">
   <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body class="theme-light">
@@ -31,14 +33,7 @@
 
     <!-- Khu vực Settings bên phải -->
     <div class="settings-container">
-      <h2>Cài Đặt</h2>
-      <div class="setting-group">
-        <label for="chatModeSelect">Chế độ Chat:</label>
-        <select id="chatModeSelect">
-          <option value="normal">Chat Thông Thường</option>
-          <option value="document">Chat với Tài liệu</option>
-        </select>
-      </div>
+      <h2>Settings</h2>
       <div class="setting-group">
         <label for="modelSelect">Mô hình:</label>
         <select id="modelSelect">
@@ -52,13 +47,22 @@
         <input type="number" id="temperatureInput" value="0.5" step="0.1" min="0" max="1">
       </div>
       <!-- Phần upload file tùy chỉnh -->
-      <div class="setting-group upload-group" id="uploadGroup" style="display: none;">
-        <label>Upload File Tài liệu:</label>
+      <div class="setting-group upload-group" id="uploadGroup">
+        <h2>Upload File Tài liệu:</h2>
+        <div class="setting-group">
+          <label for="indexNameInput">Index Name: Tùy chọn</label>
+          <input type="text" id="indexNameInput" placeholder="vd: tenindex. Không dấu, không khoảng trắng" required>
+        </div>
+
+        <div class="setting-group">
+          <label for="descriptionInput">Description: Tài liệu liên quan đến chủ đề gì?</label>
+          <input type="text" id="descriptionInput" placeholder="Mô tả tài liệu..." required>
+        </div>
         <div class="custom-file-upload">
           <label for="fileInput" class="file-label">
             <i class="fas fa-upload"></i> Chọn file
           </label>
-          <input type="file" id="fileInput">
+          <input type="file" id="fileInput" accept=".docx,.pdf" required>
           <span id="fileName">Chưa có file nào được chọn</span>
           <button id="uploadBtn" class="upload-button">
             <i class="fas fa-cloud-upload-alt"></i> Upload
