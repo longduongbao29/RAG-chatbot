@@ -1,0 +1,372 @@
+/* Reset cơ bản */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Theme light */
+body.theme-light {
+    font-family: 'Roboto', sans-serif;
+    background: #f0f4f8;
+    color: #333;
+}
+
+/* Theme dark */
+body.theme-dark {
+    font-family: 'Roboto', sans-serif;
+    background: #1e1e1e;
+    color: #f0f4f8;
+}
+
+/* Căn giữa trang */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Main container chia làm 2 cột */
+.main-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Khi dùng theme dark, cập nhật background main-container */
+body.theme-dark .main-container {
+    background: #2e2e2e;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Chat container bên trái */
+.chat-container {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 650px;
+}
+
+/* Header chat */
+header {
+    background: #4a90e2;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+}
+
+/* Cập nhật header trong theme dark */
+body.theme-dark header {
+    background: #333;
+}
+
+/* Chat area */
+.chat-area {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #eef3f8;
+    max-height: 500px;
+    /* tuỳ chỉnh theo layout mong muốn */
+}
+
+
+/* Cập nhật chat-area trong theme dark */
+body.theme-dark .chat-area {
+    background: #2e2e2e;
+}
+
+/* Các tin nhắn chat */
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 80%;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.message .message-content {
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.message i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Tin nhắn của Bot: căn trái, màu nền xám nhạt */
+.bot-message {
+    justify-content: flex-start;
+}
+
+.bot-message .message-content {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top-left-radius: 0;
+}
+
+/* Tin nhắn của Người dùng: căn phải, màu nền xanh nhạt */
+/* Tin nhắn của Người dùng: căn phải, màu nền xanh nhạt */
+.user-message {
+    justify-content: flex-end;
+    max-width: 100%;
+    /* Giảm max-width từ 80% xuống để không chiếm quá nhiều không gian bên phải */
+    margin-right: 15px;
+    /* Thêm margin phải để tạo khoảng cách hợp lý */
+}
+
+.user-message .message-content {
+    background: #4a90e2;
+    color: #fff;
+    border: 1px solid #4a90e2;
+    border-top-right-radius: 0;
+}
+
+/* Tin nhắn hệ thống: căn giữa */
+.system-message {
+    justify-content: center;
+}
+
+.system-message .message-content {
+    background: transparent;
+    color: #888;
+    border: none;
+    font-style: italic;
+}
+
+/* Input area */
+.input-area {
+    display: flex;
+    padding: 10px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+}
+
+/* Cập nhật input-area trong theme dark */
+body.theme-dark .input-area {
+    background: #2e2e2e;
+    border-top: 1px solid #444;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+/* Cập nhật input trong theme dark */
+body.theme-dark .input-area input {
+    background: #333;
+    color: #f0f4f8;
+    border: 1px solid #555;
+}
+
+.input-area input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+.input-area button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #4a90e2;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 16px;
+}
+
+.input-area button:hover {
+    background: #357ab8;
+}
+
+/* Settings container bên phải */
+.settings-container {
+    flex: 1;
+    padding: 20px;
+    background: #f7fafc;
+    border-left: 1px solid #ddd;
+}
+
+/* Cập nhật settings-container trong theme dark */
+body.theme-dark .settings-container {
+    background: #2e2e2e;
+    border-left: 1px solid #444;
+}
+
+.settings-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #4a90e2;
+}
+
+/* Cập nhật tiêu đề trong theme dark */
+body.theme-dark .settings-container h2 {
+    color: #f0f4f8;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Cập nhật label trong theme dark */
+body.theme-dark .setting-group label {
+    color: #f0f4f8;
+}
+
+.setting-group select,
+.setting-group input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    font-size: 14px;
+}
+
+.setting-group select:focus,
+.setting-group input[type="number"]:focus {
+    border-color: #4a90e2;
+}
+
+/* Custom file upload */
+.custom-file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-file-upload .file-label {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #4a90e2;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+.custom-file-upload .file-label:hover {
+    background: #357ab8;
+}
+
+.custom-file-upload input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload #fileName {
+    font-size: 14px;
+    color: #555;
+}
+
+.custom-file-upload .upload-button {
+    padding: 8px 12px;
+    background: #50c878;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.custom-file-upload .upload-button:hover {
+    background: #3ea96f;
+}
+
+/* Nút chuyển theme: hình tròn, cố định ở góc dưới bên phải */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, transform 0.3s;
+}
+
+.theme-toggle:hover {
+    background: #357ab8;
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .settings-container {
+        border-left: none;
+        border-top: 1px solid #ddd;
+    }
+}
+
+/* Cập nhật tin nhắn của Bot trong dark mode */
+body.theme-dark .bot-message .message-content {
+    background: #444;
+    /* Màu nền tối hơn cho Bot */
+    border: 1px solid #555;
+    /* Viền nhạt để phân cách */
+    color: #f0f4f8;
+    /* Màu chữ sáng */
+}
+
+/* Cập nhật tin nhắn của Người dùng trong dark mode */
+body.theme-dark .user-message .message-content {
+    background: #0057e7;
+    /* Màu xanh đậm hơn để tạo sự tương phản */
+    border: 1px solid #0057e7;
+    color: #fff;
+    /* Màu chữ trắng */
+}
+
+.input-area #clearChatBtn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 20px;
+    background: #e74c3c;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 16px;
+    margin-left: 8px;
+}
+
+.input-area #clearChatBtn:hover {
+    background: #c0392b;
+}

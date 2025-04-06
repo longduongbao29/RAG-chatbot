@@ -1,20 +1,75 @@
-<html>
-  <body>
-    <input id="q" placeholder="Nhập câu hỏi..." />
-    <button onclick="ask()">Hỏi</button>
-    <div id="a"></div>
+<!DOCTYPE html>
+<html lang="vi">
 
-    <script>
-      async function ask() {
-        const q = document.getElementById("q").value;
-        const res = await fetch("/ask", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: q })
-        });
-        const data = await res.json();
-        document.getElementById("a").innerText = "Trả lời: " + data.answer;
-      }
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatbot RAG</title>
+  <!-- Font Google và FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="theme-light">
+
+  <div class="main-container">
+    <!-- Khu vực chat bên trái -->
+    <div class="chat-container">
+      <header>
+        <h1>Chatbot RAG</h1>
+      </header>
+      <div class="chat-area" id="chatArea">
+        <!-- Tin nhắn sẽ được hiển thị tại đây -->
+      </div>
+      <div class="input-area">
+        <input type="text" id="chatInput" placeholder="Nhập tin nhắn...">
+        <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        <button id="clearChatBtn" title="Xóa toàn bộ chat"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>
+
+    <!-- Khu vực Settings bên phải -->
+    <div class="settings-container">
+      <h2>Cài Đặt</h2>
+      <div class="setting-group">
+        <label for="chatModeSelect">Chế độ Chat:</label>
+        <select id="chatModeSelect">
+          <option value="normal">Chat Thông Thường</option>
+          <option value="document">Chat với Tài liệu</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label for="modelSelect">Mô hình:</label>
+        <select id="modelSelect">
+          <option value="model1">Model 1</option>
+          <option value="model2">Model 2</option>
+          <option value="model3">Model 3</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label for="temperatureInput">Temperature:</label>
+        <input type="number" id="temperatureInput" value="0.5" step="0.1" min="0" max="1">
+      </div>
+      <!-- Phần upload file tùy chỉnh -->
+      <div class="setting-group upload-group" id="uploadGroup" style="display: none;">
+        <label>Upload File Tài liệu:</label>
+        <div class="custom-file-upload">
+          <label for="fileInput" class="file-label">
+            <i class="fas fa-upload"></i> Chọn file
+          </label>
+          <input type="file" id="fileInput">
+          <span id="fileName">Chưa có file nào được chọn</span>
+          <button id="uploadBtn" class="upload-button">
+            <i class="fas fa-cloud-upload-alt"></i> Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Nút chuyển theme: hình tròn, cố định ở góc dưới bên phải -->
+  <button id="themeToggleBtn" class="theme-toggle">🌙</button>
+  <script src="script.js"></script>
+</body>
+
 </html>
