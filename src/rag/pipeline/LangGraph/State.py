@@ -4,6 +4,7 @@ from typing import Annotated
 
 class State(TypedDict):
     query: str
+    history:str
     translated_queries: list[str] 
     tools : list
     context: str 

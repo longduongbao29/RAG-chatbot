@@ -2,7 +2,7 @@ import tempfile
 from fastapi import  HTTPException, APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
 
-from src.api.models import  ModelParams, Question
+from src.api.models import  ModelParams, Record
 from src.database.ElasticManager import ElasticManager
 from src.rag.strategy.chunking.loader.LoaderRouter import LoaderRouter
 from src.rag.pipeline.LangGraph.Graph import Graph
@@ -14,7 +14,7 @@ logger  = setup_logger(__name__)
 
 manager = injector.get(ElasticManager)
 chat = injector.get(Graph)
-router = APIRouter(prefix="/api")
+router = APIRouter(prefix="/api", tags=["api"])
 
 @router.post("/index")
 async def index(index_name:str, description:str,file: UploadFile = File(...)):
@@ -32,10 +32,10 @@ async def index(index_name:str, description:str,file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/ask")
-async def ask(question: Question):
+@router.post("/chat")
+async def ask(record_chat: Record):
     try:
-        answer = chat.run(question.query)
+        answer = chat.run(record_chat.messages)
         return JSONResponse(content={"answer": answer}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

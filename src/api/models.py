@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, Field
 
 # Model cho tài liệu
 class Document(BaseModel):
@@ -13,3 +12,12 @@ class Question(BaseModel):
 class ModelParams(BaseModel):
     model_name: str
     temperature: float
+    
+class Record(BaseModel):
+    messages: list = Field(
+        ...,
+        example=[
+            {"role": "user", "message": "Hello, how are you?"},
+            {"role": "AI", "message": "I'm good, thank you! How can I assist you today?"}
+        ]
+    )

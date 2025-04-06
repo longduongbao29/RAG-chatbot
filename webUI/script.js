@@ -51,7 +51,22 @@ chatInput.addEventListener('keypress', (event) => {
         sendMessage();
     }
 });
-
+function getChatHistory() {
+    const messages = [];
+    const messageElements = chatArea.querySelectorAll('.message');
+    messageElements.forEach((element) => {
+        const content = element.querySelector('.message-content span').textContent;
+        const isUser = element.classList.contains('user-message');
+        messages.push({
+            role: isUser ? 'user' : 'AI',
+            message: content,
+        });
+    });
+    if (messages.length > 0) {
+        messages.pop();
+    }
+    return messages;
+}
 async function sendMessage() {
     const message = chatInput.value.trim();
     if (message === '') return;
@@ -66,12 +81,14 @@ async function sendMessage() {
     chatArea.scrollTop = chatArea.scrollHeight;
 
     try {
-        const response = await fetch(API_URL + "/ask", {
+        const history = getChatHistory();
+  
+        const response = await fetch(API_URL + "/chat", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ query: message })
+            body: JSON.stringify({messages: history}),
         });
 
         if (!response.ok) {
@@ -233,11 +250,9 @@ async function sendModelChangeRequest(model, temperature) {
         }
 
         const data = await response.json();
-        console.log('Thay đổi mô hình thành công:', data);
-        // Tùy chọn: Hiển thị thông báo thành công nếu cần
+
     } catch (error) {
-        console.error('Lỗi khi thay đổi mô hình:', error);
-        // Tùy chọn: Hiển thị thông báo lỗi nếu cần
+
     }
 }
 

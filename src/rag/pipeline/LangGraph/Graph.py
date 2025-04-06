@@ -9,7 +9,7 @@ from src.llm.LLM import LLM
 from src.rag.pipeline.LangGraph.State import State
 from src.rag.pipeline.LangGraph.Prompt import ANALYZE_TOOL_PROMPT,RAG_PROMPT,ANALYZE_QUERY_PROMPT
 from src.rag.pipeline.LangGraph.Schemas import AnalyzedTools,Decision
-
+from src.utils.helpers import format_history
 
 from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
@@ -69,10 +69,12 @@ class Graph:
         logger.info("Chatbot node")
         query = state["query"]
         context = state["context"]
+        history = state["history"]
         chain = RAG_PROMPT|self.llm
         answer = chain.invoke({
             "query":query,
-            "context":context
+            "context":context,
+            "history":history
         })
         # logger.info(f"Context retrieved:{context}")
         content = LLM.remove_think_tags(answer.content)
@@ -103,12 +105,13 @@ class Graph:
         self.graph_builder.add_edge("chatbot", END)
         return self.graph_builder.compile(checkpointer=self.memory)
         
-    def run(self, query:str):
-        
+    def run(self, record_chat:list):
+        query = record_chat[-1]["message"]
         config = {"configurable": {"thread_id": "1"},"logging": {"level": "ERROR"} }
         events = self.graph.stream(
             {"query": query,
              "messages": [{"role": "user", "content": query}],
+             "history": format_history(record_chat[:-1]),
              "translated_queries": [] ,
              "tools" : [],
              "context": "" },

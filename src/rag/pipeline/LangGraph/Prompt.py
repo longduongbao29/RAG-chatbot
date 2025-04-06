@@ -46,5 +46,6 @@ If you don't know the answer, just say that you don't know.
 Do not provide any explanations for your answers.
 Question: {query}
 Context: {context}
+History chat: {history}
 """
 RAG_PROMPT = ChatPromptTemplate.from_template(rag_promt)
