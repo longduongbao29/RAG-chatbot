@@ -1,9 +1,8 @@
 import tempfile
 from fastapi import  HTTPException, APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
-from yaml import Loader
-from src.api.models import  ModelParams, Question
 
+from src.api.models import  ModelParams, Question
 from src.database.ElasticManager import ElasticManager
 from src.rag.strategy.chunking.loader.LoaderRouter import LoaderRouter
 from src.rag.pipeline.LangGraph.Graph import Graph

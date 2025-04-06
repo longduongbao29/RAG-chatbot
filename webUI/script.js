@@ -14,7 +14,7 @@ const fileInput = document.getElementById('fileInput');
 const fileNameSpan = document.getElementById('fileName');
 const uploadBtn = document.getElementById('uploadBtn');
 
-API_URL = "https://52.194.241.126:8002/api"
+API_URL = "http://52.194.241.126:8002/api"
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedChat = localStorage.getItem('chatHistory');

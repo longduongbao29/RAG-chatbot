@@ -12,4 +12,4 @@ COPY key.pem /app/key.pem
 EXPOSE 8000
 
 
-CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "443", "--ssl-keyfile", "/app/key.pem", "--ssl-certfile", "/app/cert.pem"]
+CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "80"]
