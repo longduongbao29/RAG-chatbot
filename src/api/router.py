@@ -2,12 +2,12 @@ import tempfile
 from fastapi import  HTTPException, APIRouter, UploadFile, File
 from fastapi.responses import JSONResponse
 from yaml import Loader
-from src.api.models import  Question
+from src.api.models import  ModelParams, Question
 
 from src.database.ElasticManager import ElasticManager
 from src.rag.strategy.chunking.loader.LoaderRouter import LoaderRouter
 from src.rag.pipeline.LangGraph.Graph import Graph
-from src.dependency import injector
+from src.dependency import Dependency, injector
 
 from src.utils.logger import setup_logger
 
@@ -38,5 +38,12 @@ async def ask(question: Question):
     try:
         answer = chat.run(question.query)
         return JSONResponse(content={"answer": answer}, status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+@router.post("/change_model")
+async def change_model(model: ModelParams):
+    try:
+        Dependency.llm.change_model(model.model_name, model.temperature)
+        return JSONResponse(content={"message": "Model changed successfully"}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

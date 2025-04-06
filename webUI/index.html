@@ -33,14 +33,22 @@
 
     <!-- Khu vực Settings bên phải -->
     <div class="settings-container">
-      <button id="themeToggleBtn" class="theme-toggle">🌙</button>
+      <div class="settings-container">
+        <div class="theme-toggle-wrapper">
+          <label class="switch">
+            <input type="checkbox" id="themeToggleBtn">
+            <span class="slider round"></span>
+          </label>
+        </div>
       <h2>Settings</h2>
       <div class="setting-group">
         <label for="modelSelect">Mô hình:</label>
         <select id="modelSelect">
-          <option value="model1">Model 1</option>
-          <option value="model2">Model 2</option>
-          <option value="model3">Model 3</option>
+          <option value="deepseek-r1-distill-llama-70b">deepseek-r1-distill-llama-70b</option>
+          <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+          <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+          <option value="llama3-70b-8192">llama3-70b-8192</option>
+          <option value="meta-llama/llama-4-scout-17b-16e-instruct">meta-llama/llama-4-scout-17b-16e-instruct</option>
         </select>
       </div>
       <div class="setting-group">

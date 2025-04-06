@@ -12,6 +12,15 @@ body.theme-light {
     color: #333;
 }
 
+body.theme-light .message i {
+    transition: transform 0.3s ease;
+}
+
+body.theme-light .message:hover i {
+    transform: scale(1.2) rotate(10deg);
+    /* Phóng to và xoay nhẹ */
+}
+
 /* Theme dark */
 body.theme-dark {
     font-family: 'Roboto', sans-serif;
@@ -80,10 +89,7 @@ body.theme-dark header {
 }
 
 
-/* Cập nhật chat-area trong theme dark */
-body.theme-dark .chat-area {
-    background: #2e2e2e;
-}
+
 
 /* Các tin nhắn chat */
 .message {
@@ -164,7 +170,7 @@ body.theme-dark .chat-area {
 /* Cập nhật input-area trong theme dark */
 body.theme-dark .input-area {
     background: #2e2e2e;
-    border-top: 1px solid #444;
+    border-top: 1px solid #2e2e2e;
 }
 
 .input-area input {
@@ -341,24 +347,66 @@ body.theme-dark .setting-group label {
     }
 }
 
-/* Cập nhật tin nhắn của Bot trong dark mode */
-body.theme-dark .bot-message .message-content {
-    background: #444;
-    /* Màu nền tối hơn cho Bot */
-    border: 1px solid #555;
-    /* Viền nhạt để phân cách */
-    color: #f0f4f8;
-    /* Màu chữ sáng */
+body.theme-dark .message i {
+    transition: transform 0.3s ease;
 }
 
-/* Cập nhật tin nhắn của Người dùng trong dark mode */
-body.theme-dark .user-message .message-content {
-    background: #0057e7;
-    /* Màu xanh đậm hơn để tạo sự tương phản */
-    border: 1px solid #0057e7;
-    color: #fff;
-    /* Màu chữ trắng */
+body.theme-dark .message:hover i {
+    transform: scale(1.2) rotate(10deg);
+    /* Phóng to và xoay nhẹ */
 }
+
+body.theme-dark .bot-message .message-content {
+    background: #555;
+    /* Màu xám đậm hơn, nổi bật trên nền #2e2e2e */
+    color: #f0f4f8;
+    border: none;
+    /* Loại bỏ viền để trông mềm mại hơn */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    /* Bóng đổ nhẹ */
+    transition: all 0.3s ease;
+    border-radius: 15px 15px 15px 5px;
+    /* Bo góc không đều */
+    /* Hiệu ứng mượt mà */
+}
+
+body.theme-dark .bot-message .message-content:hover {
+    background: #666;
+    /* Sáng hơn khi hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    /* Bóng đậm hơn */
+}
+
+body.theme-dark .user-message .message-content {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    /* Gradient xanh dương */
+    color: #fff;
+    border: none;
+    /* Loại bỏ viền */
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.5),
+        /* Bóng xanh nhẹ */
+        0 0 8px rgba(0, 123, 255, 0.3);
+    /* Hiệu ứng phát sáng */
+    transition: all 0.3s ease;
+    border-radius: 15px 15px 15px 5px;
+    /* Bo góc không đều */
+}
+
+body.theme-dark .user-message .message-content:hover {
+    background: linear-gradient(135deg, #1e90ff, #0066cc);
+    /* Gradient sáng hơn khi hover */
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.6),
+        /* Bóng đậm hơn */
+        0 0 12px rgba(0, 123, 255, 0.4);
+    /* Phát sáng mạnh hơn */
+}
+
+/* Điều chỉnh chung cho khu vực chat */
+body.theme-dark .chat-area {
+    background: #252525;
+    /* Nền tối hơn một chút để đồng bộ */
+}
+
 
 .input-area #clearChatBtn {
     padding: 10px 15px;
@@ -496,4 +544,208 @@ body.theme-dark .user-message .message-content {
     button {
         padding: 10px;
     }
+}
+
+/* Wrapper để căn chỉnh công tắc và nhãn */
+.theme-toggle-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Khoảng cách giữa công tắc và nhãn */
+}
+
+/* Nhãn bên cạnh công tắc */
+.theme-label {
+    font-size: 14px;
+    color: #333;
+}
+
+body.theme-dark .theme-label {
+    color: #f0f4f8;
+}
+
+/* Ẩn checkbox mặc định */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Thanh trượt (container của công tắc) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    /* Chiều dài thanh trượt */
+    height: 24px;
+    /* Chiều cao thanh trượt */
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    /* Màu khi tắt (light mode) */
+    transition: 0.4s;
+    /* Hiệu ứng chuyển động mượt mà */
+    border-radius: 24px;
+    /* Bo tròn thanh trượt */
+}
+
+/* Nút tròn bên trong thanh trượt */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    /* Kích thước nút tròn */
+    width: 18px;
+    left: 3px;
+    /* Vị trí ban đầu */
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+    /* Bo tròn nút */
+}
+
+/* Khi checkbox được bật (dark mode) */
+.switch input:checked+.slider {
+    background-color: #4a90e2;
+    /* Màu khi bật (dark mode) */
+}
+
+/* Di chuyển nút tròn sang phải khi bật */
+.switch input:checked+.slider:before {
+    transform: translateX(26px);
+    /* Di chuyển nút sang phải */
+}
+
+/* Hiệu ứng khi hover */
+.slider:hover {
+    background-color: #bbb;
+    /* Màu sáng hơn khi hover ở chế độ tắt */
+}
+
+.switch input:checked+.slider:hover {
+    background-color: #357ab8;
+    /* Màu đậm hơn khi hover ở chế độ bật */
+}
+
+@media (max-width: 768px) {
+    .switch {
+        width: 40px;
+        height: 20px;
+    }
+
+    .slider:before {
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    .switch input:checked+.slider:before {
+        transform: translateX(20px);
+    }
+}
+
+/* Wrapper để căn chỉnh công tắc */
+.theme-toggle-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Ẩn checkbox mặc định */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Thanh trượt (container của công tắc) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    /* Tăng chiều dài để đẹp hơn */
+    height: 30px;
+    /* Tăng chiều cao */
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    /* Gradient vàng cam cho light mode */
+    transition: 0.4s ease;
+    /* Hiệu ứng mượt mà */
+    border-radius: 30px;
+    /* Bo tròn hơn */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Thêm bóng đổ */
+}
+
+/* Nút tròn bên trong thanh trượt */
+.slider:before {
+    position: absolute;
+    content: "☀️";
+    /* Biểu tượng mặt trời cho light mode */
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: 0.4s ease;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    /* Kích thước biểu tượng */
+}
+
+/* Khi bật (dark mode) */
+.switch input:checked+.slider {
+    background: linear-gradient(90deg, #4a90e2, #1e3c72);
+    /* Gradient xanh đậm cho dark mode */
+}
+
+/* Di chuyển nút tròn và thay đổi biểu tượng khi bật */
+.switch input:checked+.slider:before {
+    content: "🌙";
+    /* Biểu tượng mặt trăng cho dark mode */
+    transform: translateX(30px);
+    /* Di chuyển sang phải */
+}
+
+/* Hiệu ứng hover */
+.slider:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* Bóng đậm hơn khi hover */
+}
+
+/* Hiệu ứng khi focus hoặc active */
+.switch input:focus+.slider {
+    outline: 2px solid #4a90e2;
+    outline-offset: 2px;
+}
+
+/* Tối ưu cho theme dark */
+body.theme-dark .slider {
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    /* Bóng sáng nhẹ trong dark mode */
 }

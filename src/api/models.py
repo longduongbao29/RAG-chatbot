@@ -9,3 +9,7 @@ class Document(BaseModel):
 # Model cho câu hỏi
 class Question(BaseModel):
     query: str
+
+class ModelParams(BaseModel):
+    model_name: str
+    temperature: float

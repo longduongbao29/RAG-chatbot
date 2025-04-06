@@ -13,6 +13,7 @@ class LangchainGroqLLM(LLM):
     """
     @inject
     def __init__(self,config:Config):
+        self.config = config
         self.model_name = config.MODEL_NAME
         self.temperature = config.TEMPERATURE
         self.llm = ChatGroq(api_key=config.GROQ_API_KEY,
@@ -32,4 +33,7 @@ class LangchainGroqLLM(LLM):
         Get the LLM instance.
         """
         return self.llm
-    
+    def change_model(self, model_name: str, temperature: float):
+        self.llm = ChatGroq(api_key=self.config.GROQ_API_KEY,
+                            model_name = model_name,
+                            temperature=temperature)

@@ -1,5 +1,3 @@
-
-
 from elasticsearch import Elasticsearch
 from injector import Injector, Module, singleton
 
@@ -20,33 +18,32 @@ from src.rag.strategy.retrieval.RetrievalStrategy import RetrievalStrategy
 from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticVectorSearch, ElasticSearchTool
 from src.rag.pipeline.LangGraph.ToolsType import Tools
 
+
+
 class Dependency(Module):
+    connection_provider = ConnectionProvider()
+    config = Config()
+    embedding_model = HFEmbeddingModel(config)
+    elasticsearch = connection_provider.provide_connection(config)
+    llm = LangchainGroqLLM(config)
+    elastic_manager = ElasticManager(elasticsearch, embedding_model)
+    elastic_vector_search = ElasticVectorSearch(elastic_manager)
+    rag_fusion = RAGFusion(llm)
+    elastic_vector_search = ElasticVectorSearch(elastic_manager)
+    duckduckgo_search = DuckDuckGoSearchTool(DuckDuckGoSearch())
+    datetime_tool = DateTimeTool()
+    elastic_search_tool = ElasticSearchTool(elastic_vector_search,llm)
     def configure(self, binder):
-        connection_provider = ConnectionProvider()
-        config = Config()
-        embedding_model = HFEmbeddingModel(config)
-        elasticsearch = connection_provider.provide_connection(config)
-        elastic_manager = ElasticManager(elasticsearch, embedding_model)
-        binder.bind(Config, to=config, scope=singleton)
-        binder.bind(Elasticsearch, to=elasticsearch, scope=singleton)
-        binder.bind(EmbeddingModel, to=embedding_model, scope=singleton)
-        binder.bind(DbManager, to=elastic_manager, scope=singleton)
-        
-        llm = LangchainGroqLLM(config)
-        binder.bind(LLM, to=llm)
-        
-        rag_fusion = RAGFusion(llm)
-        binder.bind(QueryTranslation, to=rag_fusion)
-        
-        elastic_vector_search = ElasticVectorSearch(elastic_manager)
-        binder.bind(RetrievalStrategy, to=elastic_vector_search)
-        
-        binder.bind(LLMGenerator, to=LLMGenerator(llm))
-        
-        duckduckgo_search = DuckDuckGoSearchTool(DuckDuckGoSearch())
-        datetime_tool = DateTimeTool()
-        elastic_search_tool = ElasticSearchTool(elastic_vector_search,llm)
-        binder.bind(Tools, to= Tools([elastic_search_tool, duckduckgo_search, datetime_tool]))
-        
+        binder.bind(Config, to=self.config, scope=singleton)
+        binder.bind(Elasticsearch, to=self.elasticsearch, scope=singleton)
+        binder.bind(EmbeddingModel, to=self.embedding_model, scope=singleton)
+        binder.bind(DbManager, to=self.elastic_manager, scope=singleton)
+        binder.bind(LLM, to=self.llm, scope=singleton)
+        binder.bind(QueryTranslation, to=self.rag_fusion)
+        binder.bind(RetrievalStrategy, to=self.elastic_vector_search)
+        binder.bind(LLMGenerator, to=LLMGenerator(self.llm))
+        binder.bind(Tools, to= Tools([self.elastic_search_tool, self.duckduckgo_search, self.datetime_tool]))
+    
+
 
 injector = Injector([Dependency])

@@ -191,27 +191,97 @@ scrollTopBtn.addEventListener('click', () => {
     chatArea.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-themeToggleBtn.addEventListener('click', () => {
-    if (document.body.classList.contains("theme-light")) {
-        document.body.classList.remove("theme-light");
-        document.body.classList.add("theme-dark");
-        themeToggleBtn.textContent = "☀️"; // Cập nhật icon
-        localStorage.setItem('theme', 'dark'); // Lưu theme dark
-    } else {
-        document.body.classList.remove("theme-dark");
-        document.body.classList.add("theme-light");
-        themeToggleBtn.textContent = "🌙"; // Cập nhật icon
-        localStorage.setItem('theme', 'light'); // Lưu theme light
-    }
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('theme-dark');
-        themeToggleBtn.textContent = "☀️"; // Cập nhật icon
+        themeToggleBtn.checked = true; // Đặt checkbox thành "bật"
     } else {
         document.body.classList.add('theme-light');
-        themeToggleBtn.textContent = "🌙"; // Cập nhật icon
+        themeToggleBtn.checked = false; // Đặt checkbox thành "tắt"
     }
+});
+
+// Xử lý khi người dùng bật/tắt công tắc
+themeToggleBtn.addEventListener('change', () => {
+    if (themeToggleBtn.checked) {
+        document.body.classList.remove('theme-light');
+        document.body.classList.add('theme-dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-light');
+        localStorage.setItem('theme', 'light');
+    }
+});
+
+async function sendModelChangeRequest(model, temperature) {
+    try {
+        const response = await fetch(`${API_URL}/change_model`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model_name: model,
+                temperature: parseFloat(temperature), // Chuyển temperature thành số
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Không thể thay đổi mô hình');
+        }
+
+        const data = await response.json();
+        console.log('Thay đổi mô hình thành công:', data);
+        // Tùy chọn: Hiển thị thông báo thành công nếu cần
+    } catch (error) {
+        console.error('Lỗi khi thay đổi mô hình:', error);
+        // Tùy chọn: Hiển thị thông báo lỗi nếu cần
+    }
+}
+
+
+modelSelect.addEventListener('change', () => {
+    const selectedModel = modelSelect.value;
+    const temperature = temperatureInput.value;
+    localStorage.setItem('model_name', selectedModel); // Lưu vào localStorage
+    localStorage.setItem('temperature', temperature); // Lưu vào localStorage
+    sendModelChangeRequest(selectedModel, temperature);
+});
+
+// Lưu giá trị và gửi yêu cầu API khi temperature thay đổi (với debounce)
+let debounceTimer;
+temperatureInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const selectedModel = modelSelect.value;
+        const temperature = temperatureInput.value;
+        localStorage.setItem('model_name', selectedModel); // Lưu vào localStorage
+        localStorage.setItem('temperature', temperature); // Lưu vào localStorage
+        sendModelChangeRequest(selectedModel, temperature);
+    }, 500);
+});
+// Khôi phục giá trị khi trang tải
+document.addEventListener('DOMContentLoaded', () => {
+    const savedModel = localStorage.getItem('model_name');
+    const savedTemperature = localStorage.getItem('temperature');
+
+    // Nếu có giá trị đã lưu, áp dụng vào giao diện
+    if (savedModel) {
+        modelSelect.value = savedModel;
+    } else {
+        // Giá trị mặc định nếu không có trong localStorage
+        localStorage.setItem('model_name', modelSelect.value);
+    }
+
+    if (savedTemperature) {
+        temperatureInput.value = savedTemperature;
+    } else {
+        // Giá trị mặc định nếu không có trong localStorage
+        localStorage.setItem('temperature', temperatureInput.value);
+    }
+
+    // Gửi yêu cầu API để đồng bộ với server
+    sendModelChangeRequest(modelSelect.value, temperatureInput.value);
 });
