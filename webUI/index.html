@@ -1,0 +1,20 @@
+<html>
+  <body>
+    <input id="q" placeholder="Nhập câu hỏi..." />
+    <button onclick="ask()">Hỏi</button>
+    <div id="a"></div>
+
+    <script>
+      async function ask() {
+        const q = document.getElementById("q").value;
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: q })
+        });
+        const data = await res.json();
+        document.getElementById("a").innerText = "Trả lời: " + data.answer;
+      }
+    </script>
+  </body>
+</html>

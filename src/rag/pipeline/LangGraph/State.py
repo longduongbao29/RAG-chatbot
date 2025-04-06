@@ -3,7 +3,6 @@ from typing import Annotated
 
 
 class State(TypedDict):
-    index: str
     query: str
     translated_queries: list[str] 
     tools : list

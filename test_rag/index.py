@@ -1,24 +1,22 @@
 
-from uuid import uuid4
 from src.database.ElasticManager import ElasticManager
-from test_rag.dependency import injector
+from src.rag.strategy.chunking.loader.PDFLoader import PDFLoader
+from src.rag.strategy.chunking.loader.DocxLoader import DocxLoader
+from src.dependency import injector
 
-from test_rag.datas import data1, data2, data3
 manager = injector.get(ElasticManager)
 
-def index(index_name: str, text:str):
+def index(index_name: str, description:str, chunks:list):
     """
     Initialize an index in Elasticsearch.
     """
-    manager.init_index(index_name)
+    manager.init_index(index_name, description)
     
-    doc = {
-        "id": str(uuid4()),
-        "content": text,
-    }
-    manager.index(index_name, doc)
+    manager.bulk_index(index_name=index_name, chunks=chunks)
     
+loader = DocxLoader("test_rag/tieu-su-chu-tich-ho-chi-minh_22202315.docx")
+chunks = loader.chunk_text()
 
-index("test_index", data1)
-index("test_index", data2)
-index("test_index", data3)
+index_name = "hcm"
+description = "tiểu sử hồ chí minh"
+index(index_name,description, chunks)

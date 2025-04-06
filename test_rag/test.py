@@ -1,5 +1,7 @@
-from src.dependency import injector
-from src.rag.pipeline.LangGraph.Graph import Graph
-instance = injector.get(Graph)
-while True:
-    print("AI: ",instance.run(input("User: ")))
+from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticSearchTool
+
+from src.dependency import injector 
+
+tool = injector.get(ElasticSearchTool)
+
+print(tool.get_descriptions())

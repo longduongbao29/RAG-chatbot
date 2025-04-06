@@ -1,5 +1,9 @@
+fastapi[standard]
+uvicorn
+pytz
 elasticsearch
 injector
+accelerate 
 langchain 
 langchain-groq
 langchain-huggingface 
@@ -7,3 +11,5 @@ langgraph
 sentence_transformers
 duckduckgo-search
 langchain-community
+python-docx
+PyPDF2

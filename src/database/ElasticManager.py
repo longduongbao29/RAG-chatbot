@@ -1,8 +1,8 @@
+from uuid import uuid4
 from injector import inject
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 from src.embedding.EmbeddingModel import EmbeddingModel
-from src.embedding.HFEmbeddingModel import HFEmbeddingModel
 from src.config.config import Config
 from src.database.DbManager import DbManager
 from src.utils.logger import setup_logger
@@ -26,15 +26,37 @@ class ConnectionProvider:
 class ElasticManager(DbManager):
     @inject
     def __init__(self, elasticsearch: Elasticsearch, embedding : EmbeddingModel):
-        self.elasticsearch = elasticsearch
-        self.embedding = embedding
-    def init_index(self, index_name: str):
+        self.client = elasticsearch
+        self.embedding = embedding     
+        self.init_index_descriptions()
+    def init_index_descriptions(self):
+        if not self.client.indices.exists(index="index_descriptions"):
+            self.client.indices.create(
+                    index="index_descriptions",
+                    settings={
+                            "index": {
+                            "number_of_shards": 1,
+                            "number_of_replicas": 0
+                            }
+                        },
+                    mappings={
+                        "properties": {
+                            "index": {
+                                "type": "text"
+                            },
+                            "description": {
+                                "type": "text"
+                            },        
+                        }
+                    },
+                )
+    def init_index(self, index_name: str, description: str):
         """
         Initialize an index in Elasticsearch.
         """
         logger.info("Initializing index %s in Elasticsearch...", index_name)
-        if not self.elasticsearch.indices.exists(index=index_name):
-            self.elasticsearch.indices.create(
+        if not self.client.indices.exists(index=index_name):
+            self.client.indices.create(
                     index=index_name,
                     settings={
                             "index": {
@@ -58,31 +80,57 @@ class ElasticManager(DbManager):
                         }
                     },
                 )
+            self.client.index(index="index_descriptions",document=
+                                     {
+                                       "index":index_name,
+                                       "description": description  
+                                     })
             logger.info("Index %s created.", index_name)
         else:
             logger.info("Index %s already exists.", index_name)
             
     def check_health(self):
         logger.info("Checking Elasticsearch health...")
-        health = self.elasticsearch.cluster.health()
+        health = self.client.cluster.health()
         logger.info("Status: %s", health['status'])
         
-    def index(self, index_name: str, document: dict):
+    def index(self, index_name: str, text: str):
         """
         Index a document in Elasticsearch.
         """
-        logger.info("Indexing document in Elasticsearch...")
-        document['dense_vector'] = self.embedding.embed(text=document['content'])
-        response = self.elasticsearch.index(index=index_name, document=document)
+        document =  {
+            "id": str(uuid4()),
+            "content": text,
+            'dense_vector' : self.embedding.embed(text=text)
+        }
+        logger.info(f"Indexing 1 document into {index_name}...")
+        response = self.client.index(index=index_name, document=document)
         logger.info("Document indexed with ID: %s", response['_id'])
         return response
-    
+    def bulk_index(self,index_name,chunks:list):
+        logger.info(f"Indexing {len(chunks)} documents into {index_name}...")
+        actions = []
+        for chunk in chunks:
+            actions.append( {
+                            "_op_type": "index", 
+                            "_index": index_name,  
+                            "_source": {
+                                "id": str(uuid4()),
+                                "content": chunk,
+                                "dense_vector":self.embedding.embed(text=chunk)
+                            }
+                        })
+        try:
+            helpers.bulk(self.client, actions)
+            logger.info("Index successfully!")
+        except Exception as e:
+            logger.info(f"Indexing Failed due to error: {e}")
     def search(self, index_name: str, query: dict):
         """
         Search for documents in Elasticsearch.
         """
         logger.info("Searching for documents in Elasticsearch...")
-        response = self.elasticsearch.search(index=index_name, body=query)
+        response = self.client.search(index=index_name, body=query)
         logger.info("Search results: %s", response['hits']['hits'])
         return response['hits']['hits']
     
@@ -97,7 +145,7 @@ class ElasticManager(DbManager):
                 }
             }
         }
-        response = self.elasticsearch.search(index=index_name, body=body)
+        response = self.client.search(index=index_name, body=body)
         return response['hits']['hits'][:num_results]
     
     def semantic_search(self, index_name: str, query: str, num_results: int = 5)-> list[dict]:
@@ -124,7 +172,7 @@ class ElasticManager(DbManager):
                 }
             }
         }
-        response = self.elasticsearch.search(index=index_name, body=body)
+        response = self.client.search(index=index_name, body=body)
         
         # Log the results for debugging
         # logger.info("Semantic search results: %s", response['hits']['hits'])

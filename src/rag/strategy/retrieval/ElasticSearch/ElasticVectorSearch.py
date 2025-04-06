@@ -1,11 +1,16 @@
 from re import search
 from injector import inject
 from langchain_core.tools.base import BaseTool
+from langchain_core.runnables.base import Runnable
+from src.rag.strategy.retrieval.ElasticSearch.Prompt import INDEX_NAME_TEMPLATE
+from src.llm.LLM import LLM
 from src.utils.Document import Document
 from src.database.DbManager import DbManager
 from src.rag.strategy.retrieval.Types import SearchStrategy
 from src.rag.strategy.retrieval.VectorSearch import VectorSearch
-
+from src.rag.strategy.retrieval.ElasticSearch.Schemas import Index
+from src.utils.logger import setup_logger
+logger = setup_logger(__name__)
 class ElasticVectorSearch(VectorSearch):
     """
     Elastic vector search strategy for document retrieval.
@@ -54,12 +59,40 @@ class ElasticSearchTool(BaseTool):
     name:str = "elastic_search"
     description:str = "Search information from Elastic database"
     elastic_vector_search:ElasticVectorSearch = None
+    llm: Runnable = None
     @inject
-    def __init__(self, elastic_vector_serach: ElasticVectorSearch):
+    def __init__(self, elastic_vector_serach: ElasticVectorSearch, llm_:LLM):
         super().__init__()
+        self.llm = llm_.get_llm().with_structured_output(Index)
         self.elastic_vector_search = elastic_vector_serach
+    def get_descriptions(self):
+        response = self.elastic_vector_search.db_manager.client.search(
+            index="index_descriptions",  # Tên index
+            body={
+                "_source": ["index", "description"],  # Các trường cần lấy
+                "query": {
+                    "match_all": {}  # Truy vấn để lấy tất cả các document
+                },
+                "size": 1000  # Số lượng document cần lấy (có thể thay đổi)
+            }
+                                  )
+        descriptions = ""
+        for hit in response['hits']['hits']:
+             descriptions+=f'{hit["_source"]["index"]}: {hit["_source"]["description"]}\n'
+        return descriptions
+    def analyze_index_name(self, query: str):
+        index_descriptions = self.get_descriptions()
+        chain = INDEX_NAME_TEMPLATE|self.llm
+        try: 
+            index_name:Index = chain.invoke(input={"input": query, "index_descriptions": index_descriptions})
+        except Exception as e:
+            return None
+        return index_name.index_name
     def _run(self, **args):
-        index = args["index"]
+        index = self.analyze_index_name(args["query"])
+        if not index or index == "None":
+            return ""
+        logger.info(f"Retrieving documents from index: {index}")
         query: str = args["query"]
         translated_queries:list = args["translated_queries"]
         search_type = args.get("search_type", SearchStrategy.HYBRID)

@@ -22,7 +22,7 @@ class DuckDuckGoSearchTool(BaseTool):
     name:str = "duckduckgo_search"
     description:str = (
         "A wrapper around DuckDuckGo Search. "
-        "Useful for when you need to answer questions about current events. "
+        "Useful for when you need to answer questions about current events, search for information on the internet. "
         "Input should be a search query."
     )
     duckduckgo_search:DuckDuckGoSearchRun = None

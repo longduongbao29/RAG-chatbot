@@ -45,7 +45,7 @@ class Dependency(Module):
         
         duckduckgo_search = DuckDuckGoSearchTool(DuckDuckGoSearch())
         datetime_tool = DateTimeTool()
-        elastic_search_tool = ElasticSearchTool(elastic_vector_search)
+        elastic_search_tool = ElasticSearchTool(elastic_vector_search,llm)
         binder.bind(Tools, to= Tools([elastic_search_tool, duckduckgo_search, datetime_tool]))
         
 

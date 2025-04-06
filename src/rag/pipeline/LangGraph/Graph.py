@@ -2,7 +2,6 @@ from injector import inject
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
-from src.utils.logger import setup_logger
 from src.rag.pipeline.LangGraph.ToolsType import Tools
 from src.rag.strategy.query_translation.QueryTranslation import QueryTranslation
 from src.rag.strategy.generation.Generation import LLMGenerator
@@ -10,10 +9,9 @@ from src.llm.LLM import LLM
 from src.rag.pipeline.LangGraph.State import State
 from src.rag.pipeline.LangGraph.Prompt import ANALYZE_TOOL_PROMPT,RAG_PROMPT,ANALYZE_QUERY_PROMPT
 from src.rag.pipeline.LangGraph.Schemas import AnalyzedTools,Decision
-from test_rag import query
 
 
-
+from src.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 class Graph:
@@ -51,7 +49,7 @@ class Graph:
         return state
     
     def analyze_tool_node(self,state):
-        logger.info("Analyzing query...")
+        logger.info("Analyzing tools...")
         input = f"Query: {state['query']}\nTranslated Queries: {state['translated_queries']}"
         chain = ANALYZE_TOOL_PROMPT| self.llm.with_structured_output(AnalyzedTools)
         tools_name:AnalyzedTools = chain.invoke(input)
@@ -110,7 +108,6 @@ class Graph:
         config = {"configurable": {"thread_id": "1"},"logging": {"level": "ERROR"} }
         events = self.graph.stream(
             {"query": query,
-             "index": "test_index",
              "messages": [{"role": "user", "content": query}],
              "translated_queries": [] ,
              "tools" : [],
