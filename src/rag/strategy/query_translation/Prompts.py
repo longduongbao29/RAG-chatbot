@@ -3,6 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate
 rag_fusion_prompt = """You are an advanced query translator in a Retrieval-Augmented Generation system. Your task is to take a complex user query and break it down into its key components. For each component, generate a subquery that focuses on a distinct aspect of the information needed. Then, fuse these subqueries into one coherent, composite query that preserves the original intent and maximizes the relevance of the retrieved context.
 
 User Query: {query}
+History Chat: {history}
 Steps:
 
 1.Identify the key themes or components of the query.

@@ -1,6 +1,6 @@
 from injector import inject
 from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages.base import BaseMessage
 
 from src.rag.pipeline.LangGraph.ToolsType import Tools
 from src.rag.strategy.query_translation.QueryTranslation import QueryTranslation
@@ -26,14 +26,18 @@ class Graph:
         self.query_translation = query_tranlation
         self.generator = generator
         self.graph_builder = StateGraph(State)
-        self.memory = MemorySaver()
         self.graph = self.build_graph()
 
     def analyze_query(self, state):
         logger.info("Analyzing query..")
         query = state["query"]
+        history = state["history"]
         chain = ANALYZE_QUERY_PROMPT|self.llm.with_structured_output(Decision)
-        decision: Decision = chain.invoke(query)
+        try:
+            decision: Decision = chain.invoke({"input": query, "history": history})
+        except Exception as e:
+            logger.error(f"Error in analyzing query: {e}")
+            state["decision"] = "answer"
         state["decision"] = decision.decision
         return state
     
@@ -44,7 +48,8 @@ class Graph:
     def query_translation_node(self,state):
         logger.info("Query translation node")
         query = state['query']
-        translated_queries = self.query_translation.translate(query)
+        history = state['history']
+        translated_queries = self.query_translation.translate(query, history)
         state["translated_queries"] = translated_queries
         return state
     
@@ -52,7 +57,11 @@ class Graph:
         logger.info("Analyzing tools...")
         input = f"Query: {state['query']}\nTranslated Queries: {state['translated_queries']}"
         chain = ANALYZE_TOOL_PROMPT| self.llm.with_structured_output(AnalyzedTools)
-        tools_name:AnalyzedTools = chain.invoke(input)
+        try:
+            tools_name:AnalyzedTools = chain.invoke(input)
+        except Exception as e:
+            logger.error(f"Error in analyzing tools: {e}")
+            tools_name = AnalyzedTools(tools=[])
         state["tools"] = [t for t in tools_name.tools]
         # logger.info("State\n", state)
         return state
@@ -71,12 +80,15 @@ class Graph:
         context = state["context"]
         history = state["history"]
         chain = RAG_PROMPT|self.llm
-        answer = chain.invoke({
-            "query":query,
-            "context":context,
-            "history":history
-        })
-        # logger.info(f"Context retrieved:{context}")
+        try:
+            answer = chain.invoke({
+                "query":query,
+                "context":context,
+                "history":history
+            })
+            # logger.info(f"Context retrieved:{context}")
+        except Exception as e:
+            answer = BaseMessage(content="Sorry, I'm having trouble processing your request. Please try again later.")
         content = LLM.remove_think_tags(answer.content)
         state["messages"].append({
             "role": "AI",
@@ -103,7 +115,7 @@ class Graph:
         self.graph_builder.add_edge("analyze_tool","retrieve")
         self.graph_builder.add_edge("retrieve","chatbot")
         self.graph_builder.add_edge("chatbot", END)
-        return self.graph_builder.compile(checkpointer=self.memory)
+        return self.graph_builder.compile()
         
     def run(self, record_chat:list):
         query = record_chat[-1]["message"]

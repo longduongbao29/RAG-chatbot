@@ -131,6 +131,9 @@ uploadBtn.addEventListener('click', async () => {
     const indexName = indexNameInput.value.trim();
     const description = descriptionInput.value.trim();
 
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang upload...';
+
     if (!file || !indexName || !description) {
         addMessage('Hệ thống', "Vui lòng điền đầy đủ thông tin và chọn file.");
         return;
@@ -182,6 +185,7 @@ uploadBtn.addEventListener('click', async () => {
         setTimeout(() => uploadGroup.removeChild(progressBar), 2000); // Xóa thanh tiến trình sau 2 giây
         fileInput.value = "";
         fileNameSpan.textContent = "Chưa có file nào được chọn";
+        uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload';
     }
 });
 

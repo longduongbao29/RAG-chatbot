@@ -12,7 +12,7 @@ class QueryTranslation(ABC):
         self.llm = llm.get_llm().with_structured_output(Query)
     
     @abstractmethod
-    def translate(self, query: str)->list[str]:
+    def translate(self, query: str, history:str)->list[str]:
         """
         Translate the query using the specific strategy.
         """

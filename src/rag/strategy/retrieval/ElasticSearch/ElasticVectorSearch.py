@@ -86,25 +86,24 @@ class ElasticSearchTool(BaseTool):
         try: 
             index_name:Index = chain.invoke(input={"input": query, "index_descriptions": index_descriptions})
         except Exception as e:
-            return None
-        return index_name.index_name
+            return []
+        return index_name.indexs
     def _run(self, **args):
-        index = self.analyze_index_name(args["query"])
-        if not index or index == "None":
-            return ""
-        logger.info(f"Retrieving documents from index: {index}")
+        analyze_arg = args["query"]+"\n".join(args["translated_queries"])
+        indexs = self.analyze_index_name(analyze_arg)
         query: str = args["query"]
         translated_queries:list = args["translated_queries"]
         search_type = args.get("search_type", SearchStrategy.HYBRID)
         num_results = args.get("num_results", 5)
-        
         queries:list = [query] + translated_queries
         docs_retrieved = []
-        for q in queries:
-            docs_retrieved.append(self.elastic_vector_search.retrieve(index=index,
-                             query=q,
-                             search_type=search_type,
-                             num_results=num_results))
+        for index in indexs:
+            logger.info(f"Retrieving documents from index: {index}")
+            for q in queries:
+                docs_retrieved.append(self.elastic_vector_search.retrieve(index=index,
+                                query=q,
+                                search_type=search_type,
+                                num_results=num_results))
         rerank_docs = self.elastic_vector_search.rerank(docs_retrieved)[:num_results]
         context = "\n".join([doc.content for doc in rerank_docs])
         return context

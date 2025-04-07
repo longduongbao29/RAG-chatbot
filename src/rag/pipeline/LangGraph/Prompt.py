@@ -6,36 +6,47 @@ You are an expert of analyzing the user input and decide which action to take:
 - answer: Use this action for greetings, farewells, or any general conversational interaction that doesn't require knowledge retrieval.
 
 User input: {input}
+Chat history: {history}
 Your decision (retrive or answer): 
 """
 
 ANALYZE_QUERY_PROMPT = ChatPromptTemplate.from_template(analyze_query_prompt)
 
-analyze_tool_prompt = """
-You are an expert of analyzing the user input and choose which tool should be used to retrieve information base on the analysis.
-Below are some tools that you can use to analyze the user input:
-- elastic_search: search the knowledge base from elastic_database. Always use this tool as defaut.
-- duckduckgo_search: search the information online, use this tool to search realtime information.
-- datetime_tool : if query involve current, today, at the moment... use this tool to provide the datetime context.
+analyze_tool_prompt = """You are an expert at analyzing user input and selecting the appropriate tools to retrieve information based on that analysis. You have access to the following tools:
+- **elastic_search**: Searches the knowledge base using an elastic database. This is the default tool.
+- **duckduckgo_search**: Searches online for real-time information.
+- **datetime_tool**: Provides the current date and time when the query involves terms like "today," "current," "now," etc.
 
-You can use more than one tool.
-List tools must be in using order.
+**Instructions:**
 
-###
-Example:
-User input: What is the wearther like today?
-Resoning: The user is asking for the current weather, which is a realtime information. So I will use date_time_tool to get current date time, after that use duckduckgo_search to search the web for the current weather.
-Analysis (tools to use): [date_time_tool, duckduckgo_search]
+1. **Analyze the User Input:**  
+   Carefully review the query to identify key elements, such as time sensitivity or the need for real-time information.
 
-User input: Search for the latest news?
-Resoning: The user is asking for the latest news, which is a realtime information. So I will use date_time_tool to get current date time, after that use duckduckgo_search to search the web for the latest news.
-Analysis (tools to use): [date_time_tool, duckduckgo_search]
+2. **Select the Appropriate Tools:**  
+   - If the query involves real-time or current information, include **datetime_tool** to capture the current date/time context.  
+   - For real-time data or news, follow up with **duckduckgo_search**.  
+   - Always include **elastic_search** as the default tool for general knowledge-base searches if applicable.
 
-###
+3. **List the Tools in Order:**  
+   Provide a list of the tools in the exact order they should be used to fulfill the query.
 
+4. **Explain Your Reasoning:**  
+   Include a brief explanation of why each tool was selected based on the query.
 
-User input: {input}
-Analysis (tools to use):
+**Examples:**
+
+- **User Input:** "What is the weather like today?"  
+  **Reasoning:** The query asks for current weather information. Therefore, use **datetime_tool** to determine the current date/time, followed by **duckduckgo_search** for real-time weather data.  
+  **Analysis (tools to use):** `[datetime_tool, duckduckgo_search]`
+
+- **User Input:** "Search for the latest news?"  
+  **Reasoning:** The query asks for the latest news, which is time-sensitive. First, use **datetime_tool** to obtain the current context, then use **duckduckgo_search** to retrieve the latest news.  
+  **Analysis (tools to use):** `[datetime_tool, duckduckgo_search]`
+
+**Your Task:**
+
+Now, process the following user input: {input}
+**Analysis (tools to use):**
 """
 
 ANALYZE_TOOL_PROMPT = ChatPromptTemplate.from_template(analyze_tool_prompt)

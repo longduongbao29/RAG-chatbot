@@ -145,7 +145,11 @@ class ElasticManager(DbManager):
                 }
             }
         }
-        response = self.client.search(index=index_name, body=body)
+        try:
+            response = self.client.search(index=index_name, body=body)
+        except Exception as e:
+            logger.error("Full-text search failed: %s", e)
+            return []
         return response['hits']['hits'][:num_results]
     
     def semantic_search(self, index_name: str, query: str, num_results: int = 5)-> list[dict]:
@@ -172,10 +176,9 @@ class ElasticManager(DbManager):
                 }
             }
         }
-        response = self.client.search(index=index_name, body=body)
-        
-        # Log the results for debugging
-        # logger.info("Semantic search results: %s", response['hits']['hits'])
-        
-        # Return sorted results
+        try:
+            response = self.client.search(index=index_name, body=body)
+        except Exception as e:
+            logger.error("Semantic search failed: %s", e)
+            return []
         return response['hits']['hits'][:num_results]

@@ -10,14 +10,14 @@ class RAGFusion(QueryTranslation):
     RAG Fusion strategy for query translation.
     """
     
-    def translate(self, query: str):
+    def translate(self, query: str, history: str):
         """
         Translate the query using RAG Fusion strategy.
         """
         # Implement the translation logic here
         chain = RAG_FUSION_PROMPT|self.llm
         try:
-            translated_query:Query = chain.invoke({"query": query})
+            translated_query:Query = chain.invoke({"query": query,"history": history})
         except:
             logger.info("Translate query failed!")
             return []
