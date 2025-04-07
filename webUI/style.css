@@ -824,19 +824,6 @@ body.theme-dark .toggle-header h2 {
 }
 
 /* Style cho toggle group */
-.toggle-group {
-    margin: 0 30px 0 75px;
-    display: flex;
-    align-items: center;
-}
-
-.toggle-group input {
-    display: none;
-    /* Ẩn checkbox mặc định */
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
 
 @media (max-width: 600px) {
     .toggle-header h2 {
@@ -844,16 +831,5 @@ body.theme-dark .toggle-header h2 {
         color: #4a90e2;
         font-size: 15px;
     }
-    .toggle-group input {
-        display: none;
-        /* Ẩn checkbox mặc định */
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    .toggle-group {
-        margin: 0 30px 0 75px;
-        display: flex;
-        align-items: center;
-    }
+
 }
