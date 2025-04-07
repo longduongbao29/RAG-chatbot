@@ -2,7 +2,6 @@ from langgraph.graph import StateGraph, START, END
 from langchain_core.messages.base import BaseMessage
 from langchain_core.tools.base import BaseTool
 from src.database.DbManager import DbManager
-from src.rag.pipeline.LangGraph.ToolsType import Tools
 from src.rag.strategy.query_translation.RagFusion import RAGFusion
 from src.llm.Provider import LLMProvider
 from src.llm.LLM import LLM
@@ -20,11 +19,12 @@ logger = setup_logger(__name__)
 class Graph:
 
     def __init__(self, llm_params:LLMParams,db_manager:DbManager):
+        self.llm_params = llm_params
         self.llm = LLMProvider(llm_params).provide_llm()
         self.query_translation = RAGFusion(self.llm)
-        self.tools:list[BaseTool] = Tools([ElasticSearchTool(ElasticVectorSearch(db_manager),self.llm),
+        self.tools:list[BaseTool] = [ElasticSearchTool(ElasticVectorSearch(db_manager),self.llm),
                                       DuckDuckGoSearchTool(DuckDuckGoSearch()),
-                                      DateTimeTool()])
+                                      DateTimeTool()]
  
 
         self.graph_builder = StateGraph(State)
@@ -36,11 +36,12 @@ class Graph:
         history = state["history"]
         chain = ANALYZE_QUERY_PROMPT|self.llm.get_llm().with_structured_output(Decision)
         try:
-            decision: Decision = chain.invoke({"input": query, "history": history})
+            descision_invoke: Decision = chain.invoke({"input": query, "history": history})
+            decision = descision_invoke.decision
         except Exception as e:
             logger.error(f"Error in analyzing query: {e}")
             state["decision"] = "answer"
-        state["decision"] = decision.decision
+        state["decision"] = decision
         return state
     
     def decision_router(self,state):
@@ -89,9 +90,10 @@ class Graph:
                 "history":history
             })
             # logger.info(f"Context retrieved:{context}")
+            content = LLM.remove_think_tags(answer.content)
         except Exception as e:
-            answer = BaseMessage(content="Sorry, I'm having trouble processing your request. Please try again later.")
-        content = LLM.remove_think_tags(answer.content)
+            logger.error(f"Error in chatbot node: {e}")
+            content="Sorry, I'm having trouble processing your request. Please try again later."
         state["messages"].append({
             "role": "AI",
             "content": content
