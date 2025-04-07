@@ -18,14 +18,15 @@ class SyncWorker:
             chunks = loader.chunk_text()
             self.manager.init_index(index_name, description)
             self.manager.bulk_index(index_name=index_name, chunks=chunks)
-    async def index(self,file_ext,file,index_name,description):
+    async def index(self,file,index_name,description):
         file_ext = "." + file.filename.split('.')[-1].lower()
         content = await file.read()
         await asyncio.to_thread(self.index_,file_ext,content,index_name,description)
     def chat_(self,request: ChatRequest):
         model_name = request.model_name
         temperature = request.temperature
-        chat_service = self.provider.get_chat(model_name, temperature)
+        use_retrieve = request.use_retrieve
+        chat_service = self.provider.get_chat(model_name, temperature,use_retrieve)
         answer = chat_service.run(request.messages)
         return answer
     

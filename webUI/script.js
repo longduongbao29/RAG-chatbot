@@ -74,6 +74,7 @@ async function sendMessage() {
     const message = chatInput.value.trim();
     const model_name = modelSelect.value;
     const temperature = temperatureInput.value;
+    const use_rag = document.getElementById('ragToggle').checked;
     if (message === '') return;
     addMessage('Bạn', message);
     chatInput.value = '';
@@ -93,7 +94,12 @@ async function sendMessage() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ messages: history, model_name: model_name, temperature: parseFloat(temperature) }),
+            body: JSON.stringify({
+                messages: history,
+                model_name: model_name,
+                temperature: parseFloat(temperature),
+                use_retrieve: use_rag
+            }),
         });
 
         if (!response.ok) {

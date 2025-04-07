@@ -14,9 +14,10 @@ from src.utils.tools.DateTime import DateTimeTool
 from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticVectorSearch,ElasticSearchTool
 from src.utils.logger import setup_logger
 from src.utils.helpers import format_history
+from src.rag.pipeline.ChatPipeline import ChatPipeline
 logger = setup_logger(__name__)
 
-class Graph:
+class Graph(ChatPipeline):
 
     def __init__(self, llm_params:LLMParams,db_manager:DbManager):
         self.llm_params = llm_params
@@ -134,7 +135,8 @@ class Graph:
             config,
             stream_mode="values",
         )
-        
-        return list(events)[-1]["messages"][-1]["content"]
+        answer = list(events)[-1]["messages"][-1]
+        final_answer = LLM.postprocess(answer["content"])
+        return final_answer
                
         

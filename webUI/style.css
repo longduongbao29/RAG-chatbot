@@ -749,3 +749,96 @@ body.theme-dark .slider {
     box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
     /* Bóng sáng nhẹ trong dark mode */
 }
+
+/* Style cho toggle group */
+.toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.toggle-group input[type="checkbox"] {
+    display: none;
+    /* Ẩn checkbox mặc định */
+}
+
+.toggle-group .toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    background: #ccc;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.toggle-group .toggle-label::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 2px;
+    top: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Khi checkbox được chọn */
+.toggle-group input[type="checkbox"]:checked+.toggle-label {
+    background: #4a90e2;
+}
+
+.toggle-group input[type="checkbox"]:checked+.toggle-label::after {
+    transform: translateX(26px);
+}
+
+/* Cập nhật trong theme dark */
+body.theme-dark .toggle-group .toggle-label {
+    background: #555;
+}
+
+body.theme-dark .toggle-group input[type="checkbox"]:checked+.toggle-label {
+    background: #0057e7;
+}
+
+/* Căn chỉnh tiêu đề và toggle nằm trên cùng một hàng */
+.toggle-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.toggle-header h2 {
+    margin: 0 0 0 0;
+    color: #4a90e2;
+    font-size: 20px;
+}
+
+/* Cập nhật trong theme dark */
+body.theme-dark .toggle-header h2 {
+    color: #f0f4f8;
+}
+
+/* Style cho toggle group */
+.toggle-group {
+    margin: 0 30px 0 75px;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-group input[type="checkbox"] {
+    display: none;
+    /* Ẩn checkbox mặc định */
+}
+
+@media (max-width: 600px) {
+    .toggle-header h2 {
+        margin: 0 0 0 0;
+        color: #4a90e2;
+        font-size: 15px;
+    }
+}

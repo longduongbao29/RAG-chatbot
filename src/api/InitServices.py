@@ -1,3 +1,6 @@
+from math import e
+from src.rag.pipeline.ChatPipeline import ChatPipeline
+from src.rag.pipeline.NoRagPipeline import NoRagPipeline
 from src.llm.Schemas import LLMParams
 from src.rag.pipeline.LangGraph.Graph import Graph
 from src.embedding.HFEmbeddingModel import HFEmbeddingModel
@@ -18,8 +21,11 @@ class ElasticConnectionSingleton:
 class Provider:
     db_manager = ElasticManager(elasticsearch=ElasticConnectionSingleton(), embedding=HFEmbeddingModel())
 
-    def get_chat(self, model_name: str, temperature: float)-> Graph:
-        self.chat_service = Graph(LLMParams(model_name=model_name,temperature=temperature),self.db_manager)
+    def get_chat(self, model_name: str, temperature: float, use_retrieve: bool)-> ChatPipeline:
+        if use_retrieve:
+            self.chat_service = Graph(LLMParams(model_name=model_name,temperature=temperature),self.db_manager)
+        else:
+            self.chat_service = NoRagPipeline(LLMParams(model_name=model_name,temperature=temperature))
         return self.chat_service
     def get_db_manager(self):
         return self.db_manager

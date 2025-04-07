@@ -11,6 +11,7 @@ class Question(BaseModel):
 
     
 class ChatRequest(BaseModel):
+    use_retrieve: bool = Field(default=False)
     messages: list = Field(
         ...,
         example=[

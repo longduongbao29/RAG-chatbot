@@ -59,7 +59,13 @@
         </div>
         <!-- Phần upload file tùy chỉnh -->
         <div class="setting-group upload-group" id="uploadGroup">
-          <h2>Upload File Tài liệu:</h2>
+          <div class="toggle-header">
+            <h2>Chat với tài liệu:</h2>
+            <div class="toggle-group">
+              <input type="checkbox" id="ragToggle" name="ragToggle">
+              <label for="ragToggle" class="toggle-label"></label>
+            </div>
+          </div>
           <div class="setting-group">
             <label for="indexNameInput">Index Name: Tùy chọn</label>
             <input type="text" id="indexNameInput" placeholder="vd: tenindex. Không dấu, không khoảng trắng" required>

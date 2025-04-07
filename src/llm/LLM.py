@@ -1,3 +1,4 @@
+import json
 import re
 from abc import ABC, abstractmethod
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -33,3 +34,22 @@ class LLM(ABC):
         """
         # Use regex to find and remove <think>...</think> and its content
         return re.sub(r'<think>.*?</think>', '', input_string, flags=re.DOTALL).lstrip('\n')
+
+    @classmethod
+    def postprocess(cls,input_string:str):
+        """
+        Removes content within <think>...</think> tags from the input string.
+
+        Args:
+            input_string (str): The input string to process.
+
+        Returns:
+            str: The processed string with <think>...</think> content removed.
+        """
+        output = cls.remove_think_tags(input_string)
+        try:
+            output = json.loads(output)
+            output = output["message"]
+        except:
+            pass
+        return output
