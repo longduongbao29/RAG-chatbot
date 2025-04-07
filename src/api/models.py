@@ -9,11 +9,8 @@ class Document(BaseModel):
 class Question(BaseModel):
     query: str
 
-class ModelParams(BaseModel):
-    model_name: str
-    temperature: float
     
-class Record(BaseModel):
+class ChatRequest(BaseModel):
     messages: list = Field(
         ...,
         example=[
@@ -21,3 +18,6 @@ class Record(BaseModel):
             {"role": "AI", "message": "I'm good, thank you! How can I assist you today?"}
         ]
     )
+    model_name: str
+    temperature: float
+    

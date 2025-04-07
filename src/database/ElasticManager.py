@@ -3,7 +3,7 @@ from injector import inject
 from elasticsearch import Elasticsearch, helpers
 
 from src.embedding.EmbeddingModel import EmbeddingModel
-from src.config.config import Config
+from src.config.config import config
 from src.database.DbManager import DbManager
 from src.utils.logger import setup_logger
 
@@ -11,11 +11,11 @@ logger = setup_logger(__name__)
 
 
 class ConnectionProvider:
-    def provide_connection(self, configuration: Config) -> Elasticsearch:
+    def provide_connection(self) -> Elasticsearch:
         logger.info("Connecting to Elasticsearch...")
-        elasticsearch = Elasticsearch(configuration.ELASTIC_ENDPOINT, 
-                                      api_key=configuration.ELASTIC_API_KEY, 
-                                      ca_certs=configuration.ELASTIC_CERT_PATH, 
+        elasticsearch = Elasticsearch(config.ELASTIC_ENDPOINT, 
+                                      api_key=config.ELASTIC_API_KEY, 
+                                      ca_certs=config.ELASTIC_CERT_PATH, 
                                       timeout=30, 
                                       retry_on_timeout=True)
         if not elasticsearch.ping():

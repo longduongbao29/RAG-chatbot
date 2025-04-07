@@ -15,3 +15,5 @@ class Config():
     
     #EMBEDDING
     EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME","sentence-transformers/all-mpnet-base-v2")
+
+config = Config()

@@ -1,30 +1,32 @@
-from injector import inject
 from langgraph.graph import StateGraph, START, END
 from langchain_core.messages.base import BaseMessage
-
+from langchain_core.tools.base import BaseTool
+from src.database.DbManager import DbManager
 from src.rag.pipeline.LangGraph.ToolsType import Tools
-from src.rag.strategy.query_translation.QueryTranslation import QueryTranslation
-from src.rag.strategy.generation.Generation import LLMGenerator
+from src.rag.strategy.query_translation.RagFusion import RAGFusion
+from src.llm.Provider import LLMProvider
 from src.llm.LLM import LLM
+from src.llm.Schemas import LLMParams
 from src.rag.pipeline.LangGraph.State import State
 from src.rag.pipeline.LangGraph.Prompt import ANALYZE_TOOL_PROMPT,RAG_PROMPT,ANALYZE_QUERY_PROMPT
 from src.rag.pipeline.LangGraph.Schemas import AnalyzedTools,Decision
-from src.utils.helpers import format_history
-
+from src.rag.strategy.retrieval.DuckDuckGo.DuckDuckGoSearch import DuckDuckGoSearchTool,DuckDuckGoSearch
+from src.utils.tools.DateTime import DateTimeTool
+from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticVectorSearch,ElasticSearchTool
 from src.utils.logger import setup_logger
+from src.utils.helpers import format_history
 logger = setup_logger(__name__)
 
 class Graph:
-    @inject
-    def __init__(self, 
-                 llm:LLM, 
-                 query_tranlation:QueryTranslation,
-                 tools:Tools, 
-                 generator:LLMGenerator):
-        self.llm = llm.get_llm()
-        self.tools = tools.tools
-        self.query_translation = query_tranlation
-        self.generator = generator
+
+    def __init__(self, llm_params:LLMParams,db_manager:DbManager):
+        self.llm = LLMProvider(llm_params).provide_llm()
+        self.query_translation = RAGFusion(self.llm)
+        self.tools:list[BaseTool] = Tools([ElasticSearchTool(ElasticVectorSearch(db_manager),self.llm),
+                                      DuckDuckGoSearchTool(DuckDuckGoSearch()),
+                                      DateTimeTool()])
+ 
+
         self.graph_builder = StateGraph(State)
         self.graph = self.build_graph()
 
@@ -32,7 +34,7 @@ class Graph:
         logger.info("Analyzing query..")
         query = state["query"]
         history = state["history"]
-        chain = ANALYZE_QUERY_PROMPT|self.llm.with_structured_output(Decision)
+        chain = ANALYZE_QUERY_PROMPT|self.llm.get_llm().with_structured_output(Decision)
         try:
             decision: Decision = chain.invoke({"input": query, "history": history})
         except Exception as e:
@@ -56,7 +58,7 @@ class Graph:
     def analyze_tool_node(self,state):
         logger.info("Analyzing tools...")
         input = f"Query: {state['query']}\nTranslated Queries: {state['translated_queries']}"
-        chain = ANALYZE_TOOL_PROMPT| self.llm.with_structured_output(AnalyzedTools)
+        chain = ANALYZE_TOOL_PROMPT| self.llm.get_llm().with_structured_output(AnalyzedTools)
         try:
             tools_name:AnalyzedTools = chain.invoke(input)
         except Exception as e:
@@ -79,7 +81,7 @@ class Graph:
         query = state["query"]
         context = state["context"]
         history = state["history"]
-        chain = RAG_PROMPT|self.llm
+        chain = RAG_PROMPT|self.llm.get_llm()
         try:
             answer = chain.invoke({
                 "query":query,

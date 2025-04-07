@@ -14,6 +14,9 @@ const fileInput = document.getElementById('fileInput');
 const fileNameSpan = document.getElementById('fileName');
 const uploadBtn = document.getElementById('uploadBtn');
 
+const selectedModel = modelSelect.value;
+const temperature = temperatureInput.value;
+
 API_URL = "http://52.194.241.126:8002/api"
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,6 +72,8 @@ function getChatHistory() {
 }
 async function sendMessage() {
     const message = chatInput.value.trim();
+    const model_name = modelSelect.value;
+    const temperature = temperatureInput.value;
     if (message === '') return;
     addMessage('Bạn', message);
     chatInput.value = '';
@@ -82,13 +87,13 @@ async function sendMessage() {
 
     try {
         const history = getChatHistory();
-  
+
         const response = await fetch(API_URL + "/chat", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({messages: history}),
+            body: JSON.stringify({ messages: history, model_name: model_name, temperature: parseFloat(temperature) }),
         });
 
         if (!response.ok) {
@@ -236,50 +241,18 @@ themeToggleBtn.addEventListener('change', () => {
     }
 });
 
-async function sendModelChangeRequest(model, temperature) {
-    try {
-        const response = await fetch(`${API_URL}/change_model`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model_name: model,
-                temperature: parseFloat(temperature), // Chuyển temperature thành số
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Không thể thay đổi mô hình');
-        }
-
-        const data = await response.json();
-
-    } catch (error) {
-
-    }
-}
 
 
 modelSelect.addEventListener('change', () => {
-    const selectedModel = modelSelect.value;
-    const temperature = temperatureInput.value;
     localStorage.setItem('model_name', selectedModel); // Lưu vào localStorage
     localStorage.setItem('temperature', temperature); // Lưu vào localStorage
-    sendModelChangeRequest(selectedModel, temperature);
 });
 
-// Lưu giá trị và gửi yêu cầu API khi temperature thay đổi (với debounce)
-let debounceTimer;
+
 temperatureInput.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        const selectedModel = modelSelect.value;
-        const temperature = temperatureInput.value;
-        localStorage.setItem('model_name', selectedModel); // Lưu vào localStorage
-        localStorage.setItem('temperature', temperature); // Lưu vào localStorage
-        sendModelChangeRequest(selectedModel, temperature);
-    }, 500);
+    localStorage.setItem('model_name', selectedModel); // Lưu vào localStorage
+    localStorage.setItem('temperature', temperature); // Lưu vào localStorage
+
 });
 // Khôi phục giá trị khi trang tải
 document.addEventListener('DOMContentLoaded', () => {
@@ -301,6 +274,4 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('temperature', temperatureInput.value);
     }
 
-    // Gửi yêu cầu API để đồng bộ với server
-    sendModelChangeRequest(modelSelect.value, temperatureInput.value);
 });

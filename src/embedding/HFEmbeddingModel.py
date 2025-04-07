@@ -3,7 +3,7 @@ from injector import inject
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
 
-from src.config.config import Config
+from src.config.config import config
 from src.embedding.EmbeddingModel import EmbeddingModel
 from src.utils.logger import setup_logger
 
@@ -12,7 +12,7 @@ logger  = setup_logger(__name__)
 class HFEmbeddingModel(EmbeddingModel):
     
     @inject
-    def __init__(self, config: Config):
+    def __init__(self):
         """
         Initialize the Hugging Face embedding model.
         """
