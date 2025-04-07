@@ -759,8 +759,9 @@ body.theme-dark .slider {
 }
 
 .toggle-group input[type="checkbox"] {
-    display: none;
-    /* Ẩn checkbox mặc định */
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
 .toggle-group .toggle-label {
@@ -823,7 +824,15 @@ body.theme-dark .toggle-header h2 {
     color: #f0f4f8;
 }
 
-/* Style cho toggle group */
+
+/* Đảm bảo tương thích với các trình duyệt cũ */
+@supports (-webkit-appearance: none) {
+    .toggle-group input[type="checkbox"] {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+}
 
 @media (max-width: 600px) {
     .toggle-header h2 {
