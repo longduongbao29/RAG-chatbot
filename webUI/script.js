@@ -61,7 +61,7 @@ function getChatHistory() {
         const content = element.querySelector('.message-content span').textContent;
         const isUser = element.classList.contains('user-message');
         messages.push({
-            role: isUser ? 'user' : 'AI',
+            role: isUser ? 'user' : 'assistant',
             message: content,
         });
     });
