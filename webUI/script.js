@@ -218,10 +218,7 @@ clearChatBtn.addEventListener('click', () => {
     }, 2000);
 });
 
-const scrollTopBtn = document.getElementById('scrollTopBtn');
-scrollTopBtn.addEventListener('click', () => {
-    chatArea.scrollTo({ top: 0, behavior: 'smooth' });
-});
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
