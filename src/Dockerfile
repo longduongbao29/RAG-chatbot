@@ -6,9 +6,7 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/src
-COPY ca.crt /app/ca.crt
-COPY cert.pem /app/cert.pem
-COPY key.pem /app/key.pem
+RUN pip install hf_xet
 EXPOSE 8000
 
 

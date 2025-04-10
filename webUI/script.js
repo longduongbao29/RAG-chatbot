@@ -17,7 +17,7 @@ const uploadBtn = document.getElementById('uploadBtn');
 const selectedModel = modelSelect.value;
 const temperature = temperatureInput.value;
 
-API_URL = "http://52.194.241.126:8002/api"
+API_URL = "http://18.183.168.69:8002/api"
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedChat = localStorage.getItem('chatHistory');
