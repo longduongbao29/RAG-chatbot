@@ -10,7 +10,7 @@ analyze_query_messages = [
     ),
     (
         "human",
-        "User input: {input}\nChat history: {history}\nYour decision (retrive or answer):"
+        "Chat history: {history}\nUser input: {input}\nYour decision (retrive or answer):"
     )
 ]
 
@@ -66,7 +66,7 @@ rag_messages = [
     ),
     (
         "human",
-        "Question: {query}\nContext: {context}\nHistory chat: {history}"
+        "Context: {context}\nHistory chat: {history}Question: {query}\n"
     )
 ]
 

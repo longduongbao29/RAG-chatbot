@@ -9,7 +9,7 @@ index_name_messages = [
     ),
     (
         "human",
-        "User input: {input}\nIndex descriptions: {index_descriptions}\nAnalysis (list indexes to use):"
+        "Index descriptions: {index_descriptions}\nUser input: {input}\nAnalysis (list indexes to use):"
     )
 ]
 
