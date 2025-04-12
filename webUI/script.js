@@ -17,7 +17,7 @@ const uploadBtn = document.getElementById('uploadBtn');
 const selectedModel = modelSelect.value;
 const temperature = temperatureInput.value;
 
-API_URL = "http://18.183.168.69:8002/api"
+API_URL = "https://chatbotonline.site/api"
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedChat = localStorage.getItem('chatHistory');
@@ -278,3 +278,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+function getSelectedEntities() {
+    return getEntites().then(e => {
+        const selectedEntities = {};
+
+        document.querySelectorAll("#entityList .entity-item").forEach(item => {
+            const select = item.querySelector("select");
+            const selectedValue = select.value;
+            const key = select.dataset.entity;
+
+            const entityKeys = e[key]["entity"];
+
+            if (selectedValue !== "None") {
+                // Chuẩn bị object rule
+                const rule = { method: selectedValue };
+
+                // Lấy các input param nếu có
+                const inputs = item.querySelectorAll(".param-container input");
+                if (selectedValue === "mask_character" && inputs.length === 2) {
+                    rule["start"] = parseInt(inputs[0].value) || 0;
+                    rule["end"] = parseInt(inputs[1].value) || 0;
+                } else if (
+                    (selectedValue === "n_last_character" || selectedValue === "n_first_character") &&
+                    inputs.length === 1
+                ) {
+                    rule["length"] = parseInt(inputs[0].value) || 0;
+                }
+
+                // Gán rule vào từng entity liên quan
+                entityKeys.forEach(k => {
+                    selectedEntities[k] = rule;
+                });
+            }
+        });
+
+        return selectedEntities;
+    });
+}
