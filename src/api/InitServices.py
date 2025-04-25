@@ -21,11 +21,17 @@ class ElasticConnectionSingleton:
 class Provider:
     db_manager = ElasticManager(elasticsearch=ElasticConnectionSingleton(), embedding=HFEmbeddingModel())
 
-    def get_chat(self, model_name: str, temperature: float, use_retrieve: bool)-> ChatPipeline:
+    def get_chat(self, model_name: str, temperature: float, use_retrieve: bool,tools:list, instruction:str = None)-> ChatPipeline:
         if use_retrieve:
-            self.chat_service = Graph(LLMParams(model_name=model_name,temperature=temperature),self.db_manager)
+            self.chat_service = Graph(
+                LLMParams(model_name=model_name, temperature=temperature),
+                self.db_manager,
+                tools,
+                instruction,
+            )
         else:
-            self.chat_service = NoRagPipeline(LLMParams(model_name=model_name,temperature=temperature))
+            self.chat_service = NoRagPipeline(LLMParams(model_name=model_name,temperature=temperature)
+                                              ,instruction)
         return self.chat_service
     def get_db_manager(self):
         return self.db_manager

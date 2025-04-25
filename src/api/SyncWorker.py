@@ -3,12 +3,12 @@ import asyncio
 
 from src.api.InitServices import Provider
 from src.rag.strategy.chunking.loader.LoaderRouter import LoaderRouter
-from src.api.models import  ChatRequest
+from src.api.models import  ChatRequest, ChatRequestWithInstruction
 class SyncWorker:
     def __init__(self):
         self.provider = Provider()
         self.manager = self.provider.get_db_manager()
-        
+
     def index_(self,file_ext,content,index_name,description):
         with tempfile.NamedTemporaryFile(delete=True, suffix=file_ext) as temp_file:
             temp_file.write(content)
@@ -26,9 +26,29 @@ class SyncWorker:
         model_name = request.model_name
         temperature = request.temperature
         use_retrieve = request.use_retrieve
-        chat_service = self.provider.get_chat(model_name, temperature,use_retrieve)
+        tools = request.tools
+        chat_service = self.provider.get_chat(model_name, temperature, use_retrieve, tools)
         answer = chat_service.run(request.messages)
         return answer
-    
+
     async def chat(self,request: ChatRequest):
         return await asyncio.to_thread(self.chat_,request)
+
+    def chat_with_instruction_(self, request:ChatRequestWithInstruction):
+        model_name = request.model_name
+        temperature = request.temperature
+        use_retrieve = request.use_retrieve
+        instruction = request.instruction
+        tools = request.tools
+        chat_service = self.provider.get_chat(
+            model_name,
+            temperature,
+            use_retrieve,
+            tools,
+            instruction
+        )
+        answer = chat_service.run(request.messages)
+        return answer
+
+    async def chat_with_instruction(self, request: ChatRequestWithInstruction):
+        return await asyncio.to_thread(self.chat_with_instruction_, request)

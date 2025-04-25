@@ -1,7 +1,10 @@
 import logging
-import os
+from logging.handlers import RotatingFileHandler
 
-def setup_logger(name: str, log_file: str = "logs/app.log", level: int = logging.INFO) -> logging.Logger:
+
+def setup_logger(
+    name: str, log_file: str = "logs/app.log", level: int = logging.INFO
+) -> logging.Logger:
     """
     Sets up a logger with the specified name, log file, and logging level.
 
@@ -18,7 +21,9 @@ def setup_logger(name: str, log_file: str = "logs/app.log", level: int = logging
     logger.setLevel(level)
 
     # Create a file handler
-    file_handler = logging.FileHandler(log_file)
+    file_handler = RotatingFileHandler(
+        log_file, maxBytes=10 * 1024 * 1024, backupCount=5
+    )
     file_handler.setLevel(level)
 
     # Create a console handler
@@ -37,4 +42,3 @@ def setup_logger(name: str, log_file: str = "logs/app.log", level: int = logging
     # logger.addHandler(console_handler)
 
     return logger
-

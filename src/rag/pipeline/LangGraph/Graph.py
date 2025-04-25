@@ -1,17 +1,15 @@
 from langgraph.graph import StateGraph, START, END
-from langchain_core.messages.base import BaseMessage
 from langchain_core.tools.base import BaseTool
+from src.rag.pipeline.LangGraph.ToolsType import ToolManager
 from src.database.DbManager import DbManager
 from src.rag.strategy.query_translation.RagFusion import RAGFusion
 from src.llm.Provider import LLMProvider
 from src.llm.LLM import LLM
 from src.llm.Schemas import LLMParams
 from src.rag.pipeline.LangGraph.State import State
-from src.rag.pipeline.LangGraph.Prompt import ANALYZE_TOOL_PROMPT,RAG_PROMPT,ANALYZE_QUERY_PROMPT
+from src.rag.pipeline.LangGraph.Prompt import ANALYZE_TOOL_PROMPT,RAG_PROMPT,ANALYZE_QUERY_PROMPT, getPromptWithInstruction
 from src.rag.pipeline.LangGraph.Schemas import AnalyzedTools,Decision
-from src.rag.strategy.retrieval.DuckDuckGo.DuckDuckGoSearch import DuckDuckGoSearchTool,DuckDuckGoSearch
-from src.utils.tools.DateTime import DateTimeTool
-from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticVectorSearch,ElasticSearchTool
+
 from src.utils.logger import setup_logger
 from src.utils.helpers import format_history
 from src.rag.pipeline.ChatPipeline import ChatPipeline
@@ -19,14 +17,20 @@ logger = setup_logger(__name__)
 
 class Graph(ChatPipeline):
 
-    def __init__(self, llm_params:LLMParams,db_manager:DbManager):
+    def __init__(self, llm_params:LLMParams,
+                 db_manager:DbManager,
+                 tool_list:list,
+                 prompt_instruction:str = None):
         self.llm_params = llm_params
         self.llm = LLMProvider(llm_params).provide_llm()
         self.query_translation = RAGFusion(self.llm)
-        self.tools:list[BaseTool] = [ElasticSearchTool(ElasticVectorSearch(db_manager),self.llm),
-                                      DuckDuckGoSearchTool(DuckDuckGoSearch()),
-                                      DateTimeTool()]
- 
+       
+        tool_manager = ToolManager(tool_list=tool_list,
+                                   db_manager=db_manager,
+                                   llm=self.llm)
+        self.toolDescription= tool_manager.getToolDescription()
+        self.tools:list[BaseTool] = tool_manager.getTools()
+        self.prompt_instruction = prompt_instruction
 
         self.graph_builder = StateGraph(State)
         self.graph = self.build_graph()
@@ -44,11 +48,11 @@ class Graph(ChatPipeline):
             state["decision"] = "answer"
         state["decision"] = decision
         return state
-    
+
     def decision_router(self,state):
         logger.info("Decision: "+state["decision"])
         return state["decision"]
-    
+
     def query_translation_node(self,state):
         logger.info("Query translation node")
         query = state['query']
@@ -56,13 +60,14 @@ class Graph(ChatPipeline):
         translated_queries = self.query_translation.translate(query, history)
         state["translated_queries"] = translated_queries
         return state
-    
+
     def analyze_tool_node(self,state):
         logger.info("Analyzing tools...")
         input = f"Query: {state['query']}\nTranslated Queries: {state['translated_queries']}"
         chain = ANALYZE_TOOL_PROMPT| self.llm.get_llm().with_structured_output(AnalyzedTools)
         try:
-            tools_name:AnalyzedTools = chain.invoke(input)
+            tools_name:AnalyzedTools = chain.invoke({"list_tools":self.toolDescription,
+                                                     "input":input})
         except Exception as e:
             logger.error(f"Error in analyzing tools: {e}")
             tools_name = AnalyzedTools(tools=[])
@@ -83,7 +88,10 @@ class Graph(ChatPipeline):
         query = state["query"]
         context = state["context"]
         history = state["history"]
-        chain = RAG_PROMPT|self.llm.get_llm()
+        if self.prompt_instruction:
+            logger.info("Answer with instruction")
+        prompt = getPromptWithInstruction(self.prompt_instruction) if self.prompt_instruction else RAG_PROMPT
+        chain = prompt | self.llm.get_llm()
         try:
             answer = chain.invoke({
                 "query":query,
@@ -110,7 +118,7 @@ class Graph(ChatPipeline):
         self.graph_builder.add_node("analyze_tool", self.analyze_tool_node)
         self.graph_builder.add_node("retrieve", self.retrieval_node)
         self.graph_builder.add_node("chatbot", self.chatbot_node)
-        
+
         self.graph_builder.add_edge(START,"analyze_query")
         self.graph_builder.add_conditional_edges("analyze_query",self.decision_router,{
             "retrieve":"query_translation",
@@ -121,7 +129,7 @@ class Graph(ChatPipeline):
         self.graph_builder.add_edge("retrieve","chatbot")
         self.graph_builder.add_edge("chatbot", END)
         return self.graph_builder.compile()
-        
+
     def run(self, record_chat:list):
         query = record_chat[-1]["message"]
         config = {"configurable": {"thread_id": "1"},"logging": {"level": "ERROR"} }
@@ -138,5 +146,3 @@ class Graph(ChatPipeline):
         answer = list(events)[-1]["messages"][-1]
         final_answer = LLM.postprocess(answer["content"])
         return final_answer
-               
-        

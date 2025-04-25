@@ -22,10 +22,7 @@ analyze_tool_messages = [
     (
         "system",
         "You are an expert at analyzing user input and selecting the appropriate tools to retrieve information based on that analysis. "
-        "You have access to the following tools:\n"
-        "- **elastic_search**: Searches the knowledge base using an elastic database. This is the default tool.\n"
-        "- **duckduckgo_search**: Searches online for real-time information.\n"
-        "- **datetime_tool**: Provides the current date and time when the query involves terms like \"today,\" \"current,\" \"now,\" etc.\n\n"
+        "You have access to the following tools:{list_tools}\n"
         "**Instructions:**\n\n"
         "1. **Analyze the User Input:**\n"
         "   Carefully review the query to identify key elements, such as time sensitivity or the need for real-time information.\n\n"
@@ -71,3 +68,17 @@ rag_messages = [
 ]
 
 RAG_PROMPT = ChatPromptTemplate(messages=rag_messages)
+
+def getPromptWithInstruction(instruction:str):
+    messages = [(
+        "system",
+        "You are a helpful assistant that can answer questions based on the given context. "
+        "You should use the provided context to answer the question. "
+        "Do not provide any explanations for your answers."
+        f"Instruction: {instruction}"
+    ),
+    (
+        "human",
+        "Context: {context}\nHistory chat: {history}Question: {query}\n"
+    )]
+    return ChatPromptTemplate(messages=messages)
