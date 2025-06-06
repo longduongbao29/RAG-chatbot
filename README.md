@@ -1,7 +1,7 @@
 # Chatbot RAG
 
 A modern Retrieval-Augmented Generation (RAG) chatbot system with a FastAPI backend, Elasticsearch integration, and a beautiful web UI. The system supports chatting with documents (PDF, DOCX), real-time search, and multiple LLM models.
-
+![Chatbot Screenshot](image.png)
 ## Features
 
 - **Chat with AI**: Natural language chat with various LLMs (Llama, DeepSeek, etc.).
@@ -73,4 +73,3 @@ Edit `config.py` or use environment variables for:
 - LLM model name and API key
 - Embedding model
 
-![Chatbot Screenshot](image.png)
