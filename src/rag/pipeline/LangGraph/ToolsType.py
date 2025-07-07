@@ -1,13 +1,12 @@
 from langchain_core.tools.base import BaseTool
+from src.llm.LLM import LLM
 from src.rag.strategy.retrieval.DuckDuckGo.DuckDuckGoSearch import (
     DuckDuckGoSearchTool,
     DuckDuckGoSearch,
 )
 from src.utils.tools.DateTime import DateTimeTool
-from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import (
-    ElasticVectorSearch,
-    ElasticSearchTool,
-)
+from src.rag.strategy.retrieval.Reranker import LLMReranker
+from src.rag.strategy.retrieval.Milvus.MilvusSearch import MilvusSearchTool,MilvusSearch
 
 
 class Tools:
@@ -16,12 +15,12 @@ class Tools:
 
 
 class ToolManager:
-    def __init__(self, tool_list: list[str], db_manager, llm):
+    def __init__(self, tool_list: list[str], db_manager, llm:LLM):
         self.tool_list = tool_list
         self.tool_pool = {
-            "elastic_search": {
+            "milvus_search": {
                 "description": "Searches the knowledge base using an elastic database. This is the default tool.",
-                "instance": ElasticSearchTool(ElasticVectorSearch(db_manager), llm),
+                "instance": MilvusSearchTool(milvus_search=MilvusSearch(db_manager),reranker=LLMReranker(llm.get_llm())),
             },
             "duckduckgo_search": {
                 "description": "Searches online for real-time information.",

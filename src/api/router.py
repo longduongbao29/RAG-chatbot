@@ -10,9 +10,9 @@ logger  = setup_logger(__name__)
 router = APIRouter(prefix="/api", tags=["api"])
 
 @router.post("/index")
-async def index(index_name:str, description:str,file: UploadFile = File(...)):
+async def index(index_name:str,file: UploadFile = File(...)):
     try:
-        await sync_worker.index(file,index_name,description)
+        await sync_worker.index(file,index_name)
         return JSONResponse(content={"message": "Document uploaded successfully"}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

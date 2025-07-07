@@ -2,6 +2,7 @@ from re import search
 from injector import inject
 from langchain_core.tools.base import BaseTool
 from langchain_core.runnables.base import Runnable
+from src.rag.strategy.retrieval.Reranker import Reranker
 from src.rag.strategy.retrieval.ElasticSearch.Prompt import INDEX_NAME_TEMPLATE
 from src.llm.LLM import LLM
 from src.utils.Document import Document
@@ -16,9 +17,9 @@ class ElasticVectorSearch(VectorSearch):
     Elastic vector search strategy for document retrieval.
     """
     @inject
-    def __init__(self, db_manager:DbManager):
+    def __init__(self, db_manager:DbManager, reranker: Reranker):
         self.db_manager = db_manager
-    
+        self.reranker = reranker
     def get_documents(self, doc_dict:list[dict])-> list[Document]:
         """
         Convert a list of dictionaries to a list of Document objects.
@@ -49,7 +50,7 @@ class ElasticVectorSearch(VectorSearch):
             fulltext_results = self.get_documents(self.db_manager.fulltext_search(index,query))
             semantic_results = self.get_documents(self.db_manager.semantic_search(index,query))
             # Combine results from both searches
-            docs_results = self.rerank([fulltext_results, semantic_results])
+            docs_results = self.reranker.rerank([fulltext_results, semantic_results])
 
             return docs_results[:num_results]
     

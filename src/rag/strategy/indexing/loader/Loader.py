@@ -7,8 +7,6 @@ class Loader(ABC):
     def load():
         pass
         
-    @abstractmethod
-    def chunk_text():
-        pass
+   
     
   

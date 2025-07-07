@@ -13,3 +13,4 @@ duckduckgo-search
 langchain-community
 python-docx
 PyPDF2
+pymilvus==v2.6.0b0

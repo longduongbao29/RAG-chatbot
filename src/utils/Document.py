@@ -1,8 +1,9 @@
 
 
 class Document:
-    def __init__(self, id: str, content:str, score: float = 0.0):
+    def __init__(self, id: str, content:str, metadata :dict = {},score: float = 0.0):
         self.id = id
         self.content = content
+        self.metadata = metadata
         self.score = score
     

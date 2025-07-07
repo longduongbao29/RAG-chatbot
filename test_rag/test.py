@@ -1,7 +1,3 @@
-from src.rag.strategy.retrieval.ElasticSearch.ElasticVectorSearch import ElasticSearchTool
+from src.rag.strategy.indexing.chunking.Chunker import Chunker
 
-from src.dependency import injector 
-
-tool = injector.get(ElasticSearchTool)
-
-print(tool.get_descriptions())
+print(Chunker.default_chunk_text("abc"))

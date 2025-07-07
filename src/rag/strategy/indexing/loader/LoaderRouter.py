@@ -1,5 +1,5 @@
-from src.rag.strategy.chunking.loader.PDFLoader import PDFLoader
-from src.rag.strategy.chunking.loader.DocxLoader import DocxLoader
+from src.rag.strategy.indexing.loader.PDFLoader import PDFLoader
+from src.rag.strategy.indexing.loader.DocxLoader import DocxLoader
 
 class LoaderRouter:
     def __init__(self, file_path: str, chunk_size: int = 1000):

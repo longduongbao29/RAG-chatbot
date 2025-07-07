@@ -36,7 +36,7 @@ class Graph(ChatPipeline):
         self.graph = self.build_graph()
 
     def analyze_query(self, state):
-        logger.info("Analyzing query..")
+        # logger.info("Analyzing query..")
         query = state["query"]
         history = state["history"]
         chain = ANALYZE_QUERY_PROMPT|self.llm.get_llm().with_structured_output(Decision)
@@ -50,11 +50,11 @@ class Graph(ChatPipeline):
         return state
 
     def decision_router(self,state):
-        logger.info("Decision: "+state["decision"])
+        # logger.info("Decision: "+state["decision"])
         return state["decision"]
 
     def query_translation_node(self,state):
-        logger.info("Query translation node")
+        # logger.info("Query translation node")
         query = state['query']
         history = state['history']
         translated_queries = self.query_translation.translate(query, history)
@@ -62,7 +62,7 @@ class Graph(ChatPipeline):
         return state
 
     def analyze_tool_node(self,state):
-        logger.info("Analyzing tools...")
+        # logger.info("Analyzing tools...")
         input = f"Query: {state['query']}\nTranslated Queries: {state['translated_queries']}"
         chain = ANALYZE_TOOL_PROMPT| self.llm.get_llm().with_structured_output(AnalyzedTools)
         try:
@@ -76,7 +76,7 @@ class Graph(ChatPipeline):
         return state
 
     def retrieval_node(self, state):
-        logger.info("Retrieval node")
+        # logger.info("Retrieval node")
         for tool_name in state["tools"]:
             for tool in self.tools:
                 if tool_name ==  tool.name:
@@ -84,12 +84,12 @@ class Graph(ChatPipeline):
                     state["context"]+=tool.invoke(state)+"\n"
         return state
     def chatbot_node(self,state):
-        logger.info("Chatbot node")
+        # logger.info("Chatbot node")
         query = state["query"]
         context = state["context"]
         history = state["history"]
-        if self.prompt_instruction:
-            logger.info("Answer with instruction")
+        # if self.prompt_instruction:
+        #     logger.info("Answer with instruction")
         prompt = getPromptWithInstruction(self.prompt_instruction) if self.prompt_instruction else RAG_PROMPT
         chain = prompt | self.llm.get_llm()
         try:

@@ -11,7 +11,7 @@ class Question(BaseModel):
 
 
 class Tool(str,Enum):
-    ELASTIC_SEARCH = "elastic_search"
+    MILVUS_SEARCH = "milvus_search"
     DUCKDUCKGO_SEARCH = "duckduckgo_search"
     DATETIME_TOOL = "datetime_tool"
 class ChatRequest(BaseModel):

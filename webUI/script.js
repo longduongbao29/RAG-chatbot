@@ -17,7 +17,7 @@ const uploadBtn = document.getElementById('uploadBtn');
 const selectedModel = modelSelect.value;
 const temperature = temperatureInput.value;
 
-API_URL = "https://chatbotonline.site/api"
+API_URL = "http://localhost:8000/api"
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedChat = localStorage.getItem('chatHistory');
@@ -98,6 +98,7 @@ async function sendMessage() {
                 messages: history,
                 model_name: model_name,
                 temperature: parseFloat(temperature),
+                tools : ["milvus_search", "duckduckgo_search", "datetime_tool"],
                 use_retrieve: use_rag
             }),
         });
