@@ -1,0 +1,11 @@
+[project]
+name = "mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp[cli]>=1.11.0",
+    "langchain-community>=0.3.27",
+    "duckduckgo-search>=8.1.1",
+]
