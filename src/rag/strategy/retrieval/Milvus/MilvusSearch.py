@@ -1,4 +1,5 @@
-from pydantic import Field
+from pydantic import BaseModel, Field
+from typing import Optional, Type
 from langchain_core.tools.base import BaseTool
 
 from src.rag.strategy.retrieval.Reranker import Reranker
@@ -28,7 +29,19 @@ class MilvusSearch(VectorSearch):
         """
         Retrieve documents based on the query.
         """
-   
+        logger.info("Retrieving documents from Milvus...")
+        query: str = kwargs.get("query", "")
+        collection_name = kwargs.get("collection_name", "default_collection")
+        search_type = kwargs.get("search_type")
+        if search_type:
+            search_type = SearchStrategy(search_type)
+        else:
+            search_type = SearchStrategy.HYBRID
+        num_results = kwargs.get("num_results", 5)
+
+        logger.info(f"Query: {query}, Collection: {collection_name}, Search Type: {search_type}, Num Results: {num_results}")
+        docs_results = []
+
         if search_type == SearchStrategy.FULL_TEXT:
             search_results = self.db_manager.fulltext_search(collection_name,query)
             docs_results = []
@@ -42,20 +55,29 @@ class MilvusSearch(VectorSearch):
                 docs_results.append(Document(id=doc["id"], content=doc["content"],  metadata=doc.get("metadata", {}),score=doc["distance"]))
          
         elif search_type == SearchStrategy.HYBRID:
-            search_results = self.db_manager.hybrid_search(collection_name,query)
+            logger.info("Performing hybrid search...")
+            search_results = self.db_manager.hybrid_search(collection_name = collection_name,query = query)
             docs_results = []
             for doc in search_results:
                 docs_results.append(Document(id=doc["id"], content=doc["content"],  metadata=doc.get("metadata", {}),score=doc["distance"]))
         
        
         return docs_results
-        
+
+class MilvusArgsSchema(BaseModel):
+    """Arguments schema for Milvus search tool."""
+    query: str = Field(..., description="The query string to search for.")
+    translated_queries: list = Field(default_factory=list, description="Multiquery for better retrieval.")
+    collection_name: str = Field(default="default_collection", description="The name of the collection to search in.")
+    search_type: SearchStrategy = Field(default=SearchStrategy.HYBRID, description="The type of search to perform.")
+    num_results: int = Field(default=5, description="Number of results to return.")
 class MilvusSearchTool(BaseTool):
     
     name:str = "Milvus_search"
-    description:str = "Search information from Milvus vector database"
-    milvus_search: MilvusSearch = Field(default=None)
-    reranker: Reranker = Field(default=None)
+    description: str = "Search documents in Milvus using vector search."
+    args_schema: Type[BaseModel] = MilvusArgsSchema # type: ignore
+    milvus_search: Optional[MilvusSearch] = Field(default=None)
+    reranker: Optional[Reranker] = Field(default=None)
     def __init__(self, milvus_search: MilvusSearch, reranker: Reranker, **kwargs):
         super().__init__( **kwargs)
         self.milvus_search = milvus_search
