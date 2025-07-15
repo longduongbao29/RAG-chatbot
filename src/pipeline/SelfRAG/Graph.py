@@ -36,7 +36,7 @@ class SelfRAG(ChatPipeline):
         self.name = "SelfRAG"
         self.description = "Self-Retrieval Augmented Generation Pipeline"
         self.llm: BaseChatModel = kwargs.get("llm") 
-        self.retriever :RetrievalStrategy|None = kwargs.get("retriever")
+        self.retriever : RetrievalStrategy|None = kwargs.get("retriever")
         if self.retriever is None:
             raise ValueError("Retriever must be provided for SelfRAG pipeline.")
         if self.llm is None:

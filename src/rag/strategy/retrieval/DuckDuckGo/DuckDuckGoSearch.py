@@ -17,7 +17,7 @@ class DuckDuckGoSearch(OnlineSearch):
         results = self.tool.invoke(query)
         return results
     def retrieve(self, query:str):
-        return [self.search(query)]
+        return self.search(query)
 class DuckDuckGoSearchTool(BaseTool):
     name:str = "duckduckgo_search"
     description:str = (

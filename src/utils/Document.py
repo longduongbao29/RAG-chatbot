@@ -5,5 +5,5 @@ class Document:
         self.id = id
         self.content = content
         self.metadata = metadata
-        self.score = score
+
     
