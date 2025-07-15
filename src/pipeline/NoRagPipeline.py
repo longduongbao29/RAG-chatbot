@@ -29,11 +29,11 @@ class NoRagPipeline(ChatPipeline):
         self.llm = LLMProvider(llm_params).provide_llm()
     def run(self, **kargs):
         logger.info("Running NoRagPipeline")
-        record_chat = kargs.get("record_chat", [])
+        record_chat = kargs.get("inputs", [])
         user_input = record_chat[-1]
         history = format_history(record_chat)
         prompt = getPromptWithInstruction(self.instruction) if self.instruction else PROMPT
-        chain = prompt | self.llm.get_llm()
+        chain = prompt | self.llm
         answer = chain.invoke({"user_input": user_input, "history": history})
         if isinstance(answer, dict):
             content = str(answer.get("content", ""))

@@ -25,7 +25,7 @@ class MilvusSearch(VectorSearch):
         for doc in doc_dict:
             docs.append(Document(id=doc["id"], content=doc["content"], metadata=doc.get("metadata", {}), score=doc["distance"]))
         return docs
-    def retrieve(self, collection_name:str, query:str, search_type: SearchStrategy = SearchStrategy.HYBRID, num_results:int=5)-> list[Document]:
+    def retrieve(self, **kwargs)-> list[Document]:
         """
         Retrieve documents based on the query.
         """
