@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    build: .
+    container_name: static_web
+    ports:
+      - '8080:80'
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    container_name: ngrok_tunnel
+    depends_on:
+      - web
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}  # lưu ở .env hoặc export sẵn
+    command: http --domain=${NGROK_DOMAIN} web:80
+    ports:
+      - '4040:4040'
