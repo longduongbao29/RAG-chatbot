@@ -24,7 +24,7 @@ class SyncWorker:
         use_retrieve = request.use_retrieve
         tools = request.tools
         chat_service = self.provider.get_chat(model_name, temperature, use_retrieve, tools)
-        answer = chat_service.run(request.messages)
+        answer = chat_service.run(inputs = request.messages)
         return answer
 
     async def chat(self,request: ChatRequest):
@@ -43,7 +43,7 @@ class SyncWorker:
             tools,
             instruction
         )
-        answer = chat_service.run(request.messages)
+        answer = chat_service.run(inputs = request.messages)
         return answer
 
     async def chat_with_instruction(self, request: ChatRequestWithInstruction):
