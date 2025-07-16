@@ -1,1 +1,5 @@
-from langchain.chains.conversation.base import ConversationChain
+from src.embedding.MilvusEmbeddingModel import MilvusEmbeddingModel
+
+embedding = MilvusEmbeddingModel()
+
+print(embedding.embed("hello"))
