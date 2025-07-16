@@ -1,18 +1,21 @@
-version: '3'
+version: '3.8'
 services:
   web:
     build: .
     container_name: static_web
     ports:
-      - '8080:80'
-
-  ngrok:
-    image: ngrok/ngrok:alpine
-    container_name: ngrok_tunnel
-    depends_on:
-      - web
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}  # lưu ở .env hoặc export sẵn
-    command: http --domain=${NGROK_DOMAIN} web:80
-    ports:
-      - '4040:4040'
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - net
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    env_file: .env
+    restart: unless-stopped
+    command: tunnel run
+    networks:
+      - net
+networks:
+  net:
+    driver: bridge
