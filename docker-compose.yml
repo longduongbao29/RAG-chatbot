@@ -5,6 +5,8 @@ services:
     ports:
       - ${BACKEND_PORT}:8000
     environment:
+      - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
+      - MILVUS_URI=${MILVUS_URI}
       - GROQ_API_KEY=${GROQ_API_KEY}
       - MODEL_NAME=${MODEL_NAME}
       - TEMPERATURE=${TEMPERATURE}
@@ -23,6 +25,8 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
     restart: unless-stopped
     command: tunnel run
     networks:

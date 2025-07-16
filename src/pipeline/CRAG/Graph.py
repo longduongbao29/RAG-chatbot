@@ -34,7 +34,7 @@ class CRAG(ChatPipeline):
             dict: The final state of the pipeline after processing.
         """
         ips = {
-            "question": inputs[-1]
+            "conversation": inputs
             }
         for output in self.app.stream(ips):
             for key, value in output.items():
@@ -57,12 +57,12 @@ class CRAG(ChatPipeline):
             state (dict): New key added to state, documents, that contains retrieved documents
         """
         logger.info("---RETRIEVE---")
-        question = state["question"]
-
+        logger.info([state["conversation"]])
+        question = state["conversation"][-1]["message"]
         # Retrieval
         inputs = {"query": str(question)}
         documents = self.db_retriever.retrieve(**inputs)
-        return {"documents": documents, "question": question}
+        return {"documents": documents, "conversation": state["conversation"]}
 
 
     def generate(self,state):
@@ -76,12 +76,12 @@ class CRAG(ChatPipeline):
             state (dict): New key added to state, generation, that contains LLM generation
         """
         logger.info("---GENERATE---")
-        question = state["question"]
+        question = state["conversation"][-1]["message"]
         documents = state["documents"]
-
+        history  = state["conversation"][:-1]
         # RAG generation
-        generation = llm_generate(self.llm, question, format_docs(documents))
-        return {"documents": documents, "question": question, "generation": generation}
+        generation = llm_generate(self.llm, question, format_docs(documents, history))
+        return {"documents": documents, "conversation": state["conversation"], "generation": generation}
 
 
     def grade_documents(self,state):
@@ -96,7 +96,7 @@ class CRAG(ChatPipeline):
         """
 
         logger.info("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
-        question: str = state["question"]
+        question = state["conversation"][-1]["message"]
         documents: list[Document] = state["documents"]
 
         # Score each doc
@@ -114,7 +114,7 @@ class CRAG(ChatPipeline):
                 logger.info("---GRADE: DOCUMENT NOT RELEVANT---")
                 web_search = "Yes"
                 continue
-        return {"documents": filtered_docs, "question": question, "web_search": web_search}
+        return {"documents": filtered_docs, "conversation": state["conversation"], "web_search": web_search}
 
 
     def transform_query(self,state):
@@ -129,12 +129,13 @@ class CRAG(ChatPipeline):
         """
 
         logger.info("---TRANSFORM QUERY---")
-        question = state["question"]
+        question = state["conversation"][-1]["message"]
         documents = state["documents"]
 
         # Re-write question
         better_question = rewrite_query(llm = self.llm, question=question)
-        return {"documents": documents, "question": better_question}
+        state["conversation"][-1]["message"] = better_question
+        return {"documents": documents, "conversation": state["conversation"]}
 
 
     def web_search(self,state):
@@ -149,7 +150,7 @@ class CRAG(ChatPipeline):
         """
 
         logger.info("---WEB SEARCH---")
-        question = state["question"]
+        question = state["conversation"][-1]["message"]
         documents = state["documents"]
 
         # Web search
@@ -160,7 +161,7 @@ class CRAG(ChatPipeline):
         logger.info(f"Web search results: \n{web_results.content}")
         documents.append(web_results)
 
-        return {"documents": documents, "question": question}
+        return {"documents": documents, "conversation": state["conversation"]}
 
 
     ### Edges
@@ -178,9 +179,7 @@ class CRAG(ChatPipeline):
         """
 
         logger.info("---ASSESS GRADED DOCUMENTS---")
-        state["question"]
         web_search = state["web_search"]
-        state["documents"]
 
         if web_search == "Yes":
             # All documents have been filtered check_relevance

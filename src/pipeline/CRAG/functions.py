@@ -24,8 +24,15 @@ def grade_documents(llm: BaseChatModel, question: str, doc: Document) -> GradeDo
     retrieval_grader = grade_prompt | structured_llm_grader
     return retrieval_grader.invoke({"question": question, "document": doc.content})
 
-def format_docs(docs:list[Document]) -> str:
-    return "\n\n".join(doc.content for doc in docs)
+def format_docs(docs:list[Document], history) -> str:
+    docs_txt =  "\n\n".join(doc.content for doc in docs)
+    context = f"""
+Current conversation:
+{history}
+Retrieve infomations:
+{docs_txt}
+    """
+    return context
 
 def llm_generate(llm: BaseChatModel, question: str, docs: str) -> str:
     prompt = hub.pull("rlm/rag-prompt")
