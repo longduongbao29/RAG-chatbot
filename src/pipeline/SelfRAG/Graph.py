@@ -317,7 +317,7 @@ class SelfRAG(ChatPipeline):
         return app
     def run(self, inputs: list) -> str:
         question ={"question": inputs[-1]} 
-        for output in self.graph.stream(question):
+        for output in self.graph.stream(question, {"recursion_limit": 5}):
             for key, value in output.items():
                 logger.info(f"Node '{key}':")
                 
