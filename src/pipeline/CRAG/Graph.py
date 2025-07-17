@@ -26,7 +26,7 @@ class CRAG(ChatPipeline):
         self.web_serch_retriever = web_search_retriever
         self.app = self.build_graph()
 
-    def run(self, inputs) :
+    def run(self, inputs) -> str:
         """
         Run the CRAG pipeline.
 

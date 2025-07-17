@@ -1,5 +1,5 @@
 from langchain_groq import ChatGroq
-from langchain_openai import ChatOpenAI
+from langchain_openai.chat_models import ChatOpenAI
 
 from src.config.config import config
 from src.llm.Schemas import LLMParams

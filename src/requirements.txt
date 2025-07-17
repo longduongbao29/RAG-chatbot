@@ -3,14 +3,11 @@ uvicorn
 pytz
 elasticsearch
 injector
-# accelerate 
 langchain 
 langchain-groq
 langchain-huggingface 
 langgraph 
-# sentence-transformers
-# transformers
-ddgs
+duckduckgo-search
 langchain-community
 python-docx
 PyPDF2
