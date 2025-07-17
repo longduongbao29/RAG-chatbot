@@ -173,7 +173,7 @@ function bindEvents() {
 
             const fileNameSpan = document.createElement('span');
             fileNameSpan.className = 'file-name';
-            fileNameSpan.textContent = file.name + `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            fileNameSpan.textContent = file.name + ` - ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
             fileNameSpan.prepend(fileIcon); // ⬅️ thêm icon trước tên
             try {
                 await uploadfile(file)
