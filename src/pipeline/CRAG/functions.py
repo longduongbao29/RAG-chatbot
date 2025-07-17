@@ -7,7 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 from src.rag.strategy.retrieval.OnlineSearch import OnlineSearch
 from src.pipeline.CRAG.models import GradeDocuments
 from src.utils.Document import Document
-
+from src.utils.helpers import format_history
 def grade_documents(llm: BaseChatModel, question: str, doc: Document) -> GradeDocuments:
     structured_llm_grader = llm.with_structured_output(GradeDocuments)
     # Prompt
@@ -28,7 +28,7 @@ def format_docs(docs:list[Document], history) -> str:
     docs_txt =  "\n\n".join(doc.content for doc in docs)
     context = f"""
 Current conversation:
-{history}
+{format_history(history)}
 Retrieve infomations:
 {docs_txt}
     """

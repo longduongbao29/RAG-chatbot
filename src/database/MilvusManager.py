@@ -129,7 +129,6 @@ class MilvusManager(DbManager):
         """
         Perform a hybrid search in Milvus.
         """
-        logger.info("Performing hybrid search in collection %s...", collection_name)
         query_embedding = self.embedding_model.embed(text=query)
 
         # Set up BM25 search request
@@ -152,7 +151,8 @@ class MilvusManager(DbManager):
             limit=5,
             output_fields=["content", "metadata"],
         )
-        hybrid_results = results[0]
-
+        hybrid_results = []
+        if results:
+            hybrid_results = results[0]
         return hybrid_results
    
