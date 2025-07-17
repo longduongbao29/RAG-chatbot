@@ -248,7 +248,13 @@ function addMessage(sender, text) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', `${sender === 'Bạn' ? 'user' : sender === 'Bot' ? 'bot' : 'system'}-message`);
     const icon = sender === 'Bạn' ? '<i class="fas fa-user"></i>' : sender === 'Bot' ? '<i class="fas fa-robot"></i>' : '';
-    messageDiv.innerHTML = `<div class="message-content">${icon} <span>${text}</span></div>`;
+    messageDiv.innerHTML = `
+  <div class="message-content with-icon">
+    <i class="${sender === 'Bạn' ? 'fas fa-user' : sender === 'Bot' ? 'fas fa-robot' : ''} message-icon-inline"></i>
+    <span class="message-text">${text}</span>
+  </div>
+`;
+
     chatArea.appendChild(messageDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
     localStorage.setItem('chatHistory', chatArea.innerHTML);
@@ -296,7 +302,8 @@ async function sendMessage() {
 
         chatArea.removeChild(loadingMessage);
         const data = await response.json();
-        addMessage('Bot', data.answer || 'Không nhận được phản hồi từ bot.');
+        const parsedAnswer = marked.parse(data.answer || 'Không nhận được phản hồi từ bot.');
+        addMessage('Bot', parsedAnswer);
     } catch (err) {
         chatArea.removeChild(loadingMessage);
         addMessage('Bot', `Có lỗi xảy ra khi gửi tin nhắn: ${err.message}`);

@@ -505,3 +505,76 @@ body.theme-dark #newChatBtn {
 body.theme-dark #newChatBtn:hover {
     background: #1c6394;
 }
+.message {
+    display: flex;
+    align-items: flex-start;
+    /* 👈 icon nằm trên cùng */
+    gap: 8px;
+}
+.message-icon {
+    font-size: 18px;
+    color: inherit;
+    padding-top: 4px;
+}
+.message-content {
+    background: #fff;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    max-width: 100%;
+    line-height: 1.5;
+}
+
+.bot-message .message-content {
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+}
+
+.user-message .message-content {
+    background: #4a90e2;
+    color: white;
+}
+.message-content.with-icon {
+    position: relative;
+    padding-left: 40px;
+    /* 👈 đủ chỗ cho icon và khoảng trắng */
+}
+
+.message-icon-inline {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    color: inherit;
+    margin-right: 8px;
+    /* 👈 tạo khoảng cách với chữ */
+}
+.message-text {
+    display: inline-block;
+}
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+    margin: 6px 0;
+    font-weight: bold;
+}
+
+.message-content ul {
+    padding-left: 20px;
+    margin: 6px 0;
+}
+
+.message-content li {
+    margin-bottom: 4px;
+}
+
+.message-content strong {
+    font-weight: 600;
+}
+
+.message-content code {
+    background: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+}
