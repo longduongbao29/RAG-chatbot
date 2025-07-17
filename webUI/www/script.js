@@ -10,11 +10,17 @@ const providerSelect = document.getElementById('providerSelect');
 const temperatureInput = document.getElementById('temperatureInput');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
 const addToolBtn = document.getElementById('addToolBtn');
+const ragStrategySelect = document.getElementById('ragStrategySelect');
+const fileUploadBtn = document.querySelector('.chatbar-icon.left');
+const fileInput = document.getElementById('fileUploader');
+const uploadedFilesList = document.getElementById('uploadedFilesList');
+const newChatBtn = document.getElementById('newChatBtn');
 
 // ===============================
 // Constants
 // ===============================
 const API_URL = "https://api.chatbotonline.site/api";
+// const API_URL = "http://localhost:1234/api"
 const models = {
     groq: [
         { value: "meta-llama/llama-4-scout-17b-16e-instruct", label: "meta-llama/llama-4-scout-17b (Khuyên dùng)" },
@@ -24,6 +30,7 @@ const models = {
         { value: "llama3-70b-8192", label: "llama3-70b-8192" },
     ],
     openai: [
+        { value: "gpt-4.1-nano", label: "gpt-4.1-nano" },
         { value: "gpt-4o-mini", label: "gpt-4o-mini" }
     ]
 };
@@ -34,7 +41,8 @@ const models = {
 document.addEventListener('DOMContentLoaded', () => {
     restoreTheme();
     restoreSettings();
-    // restoreChatHistory();
+    restoreChatHistory();
+    restoreUploadedFiles()
     bindEvents();
 });
 
@@ -51,15 +59,84 @@ function restoreChatHistory() {
         chatArea.scrollTop = chatArea.scrollHeight;
     }
 }
+function restoreUploadedFiles() {
+    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+
+    uploadedFiles.forEach(file => {
+        const listItem = document.createElement('li');
+
+        const fileIcon = document.createElement('i');
+        fileIcon.className = getFileIconClass(file.type); // 👈 icon theo loại file
+        fileIcon.style.marginRight = '6px';
+
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.className = 'file-name';
+        fileNameSpan.textContent = file.name + ` - ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+        fileNameSpan.prepend(fileIcon); // ⬅️ thêm icon trước tên
+        // Xử lý click preview
+        fileNameSpan.addEventListener('click', () => {
+            if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+                window.open(file.url, '_blank');
+            }
+        });
+
+        listItem.appendChild(fileNameSpan);
+        uploadedFilesList.appendChild(listItem);
+    });
+}
 
 function restoreSettings() {
+    if (!localStorage.getItem('session_id')) {
+        resetSession()
+    }
+
     const savedProvider = localStorage.getItem('provider') || 'groq';
     providerSelect.value = savedProvider;
     updateModelList(savedProvider);
 
     const savedTemperature = localStorage.getItem('temperature');
     if (savedTemperature) temperatureInput.value = savedTemperature;
+
+    const savedRAG = localStorage.getItem('rag_strategy') || 'no_rag';
+    ragStrategySelect.value = savedRAG;
+
 }
+
+function resetSession() {
+    old_session_id = localStorage.getItem('session_id')
+    if (old_session_id) {
+        try {
+
+            fetch(`${API_URL}/delete_session/${old_session_id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+            })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    new_session_id = crypto.randomUUID()
+    localStorage.setItem('session_id', new_session_id)
+    try {
+
+        fetch(`${API_URL}/create_session/${new_session_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+    } catch (error) {
+        console.log(error);
+
+    }
+
+}
+
+function getFileIconClass(fileType) {
+    if (fileType.startsWith('image/')) return 'fas fa-file-image';
+    if (fileType === 'application/pdf') return 'fas fa-file-pdf';
+    if (fileType.startsWith('text/')) return 'fas fa-file-alt';
+    return 'fas fa-file'; // Mặc định: biểu tượng file chung
+}
+
 
 function bindEvents() {
     themeToggleBtn.addEventListener('change', toggleTheme);
@@ -78,8 +155,82 @@ function bindEvents() {
             alert("Chức năng thêm tài liệu sẽ sớm khả dụng!");
         });
     }
-}
+    ragStrategySelect.addEventListener('change', () => {
+        localStorage.setItem('rag_strategy', ragStrategySelect.value);
+    });
+    fileUploadBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+    fileInput.addEventListener('change', async () => {
+        const files = Array.from(fileInput.files);
+        for (const file of files) {
+            const listItem = document.createElement('li');
 
+            const fileIcon = document.createElement('i');
+            fileIcon.className = getFileIconClass(file.type); // 👈 icon theo loại file
+            fileIcon.style.marginRight = '6px';
+
+
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.className = 'file-name';
+            fileNameSpan.textContent = file.name + `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            fileNameSpan.prepend(fileIcon); // ⬅️ thêm icon trước tên
+            try {
+                await uploadfile(file)
+                // Cập nhật localStorage
+                let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+                uploadedFiles.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size
+                });
+                localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+
+                // Thêm vào UI
+                listItem.appendChild(fileNameSpan);
+                uploadedFilesList.appendChild(listItem);
+            } catch (error) {
+                console.error(error);
+                continue;
+            }
+
+        }
+
+        fileInput.value = '';
+    });
+    newChatBtn.addEventListener('click', () => {
+        if (confirm("Bạn có chắc muốn bắt đầu cuộc trò chuyện mới?")) {
+            chatArea.innerHTML = '';
+            uploadedFilesList.innerHTML = ''
+            localStorage.removeItem('chatHistory');
+            localStorage.removeItem('uploadedFiles')
+            resetSession()
+        }
+    });
+
+
+
+}
+async function uploadfile(file) {
+    // Upload lên server thật
+    const formData = new FormData();
+    formData.append('session_id', localStorage.getItem("session_id"))
+    formData.append('file', file);
+    try {
+        const res = await fetch(`${API_URL}/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        const result = await res.json();
+        addMessage('Bot', `Uploaded ${file.name}`);
+
+    } catch (err) {
+        console.error("Lỗi upload:", err);
+        addMessage('Bot', `Không thể tải lên tệp ${file.name}`);
+        throw err;
+
+    }
+}
 // ===============================
 // Theme Handling
 // ===============================
@@ -115,11 +266,10 @@ function getChatHistory() {
 }
 
 async function sendMessage() {
+    const session_id = localStorage.getItem("session_id")
+
     const message = chatInput.value.trim();
     if (!message) return;
-
-    const model_name = modelSelect.value;
-    const temperature = parseFloat(temperatureInput.value);
 
     addMessage('Bạn', message);
     chatInput.value = '';
@@ -129,17 +279,19 @@ async function sendMessage() {
     loadingMessage.innerHTML = `<div class="message-content"><i class="fas fa-robot"></i> <span>Đang nhập...</span></div>`;
     chatArea.appendChild(loadingMessage);
     chatArea.scrollTop = chatArea.scrollHeight;
-
+    const requestBody = {
+        session_id: session_id,
+        rag_strategy: ragStrategySelect.value,      // string
+        messages: getChatHistory(),                              // array of { role, message }
+        provider: providerSelect.value,                          // "groq" or "openai"
+        model_name: modelSelect.value,                           // string
+        temperature: parseFloat(temperatureInput.value),         // float
+    };
     try {
         const response = await fetch(`${API_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                messages: getChatHistory(),
-                model_name,
-                temperature,
-                tools: ["milvus_search", "duckduckgo_search", "datetime_tool"]
-            })
+            body: JSON.stringify(requestBody),
         });
 
         chatArea.removeChild(loadingMessage);

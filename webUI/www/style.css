@@ -50,8 +50,16 @@ body.theme-dark .main-container {
 header {
     background: #4a90e2;
     color: #fff;
-    padding: 15px;
-    text-align: center;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
 }
 
 body.theme-dark header {
@@ -172,6 +180,10 @@ body.theme-dark .chatbar {
 
 body.theme-light .chatbar input {
     color: #111;
+}
+
+body.theme-dark .chatbar input {
+    color: #ffffff;
 }
 
 body.theme-light .chatbar input::placeholder {
@@ -395,4 +407,101 @@ body.theme-dark #clearChatBtn {
 
 body.theme-dark #clearChatBtn:hover {
     background: #962e24;
+}
+
+#ragStrategySelect {
+    /* ví dụ: */
+    background: #f5f5f5;
+    font-weight: 500;
+}
+
+.uploaded-files-panel {
+    padding: 10px 15px;
+    border-top: 1px solid #ccc;
+    background: #f9f9f9;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+body.theme-dark .uploaded-files-panel {
+    background: #2e2e2e;
+    border-top: 1px solid #444;
+}
+
+.uploaded-files-panel h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #4a90e2;
+}
+
+.uploaded-files-panel ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.uploaded-files-panel li {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+}
+
+body.theme-dark .uploaded-files-panel li {
+    color: #eee;
+}
+
+.uploaded-files-panel li i {
+    margin-right: 6px;
+    color: #4a90e2;
+}
+
+.uploaded-files-panel li {
+    justify-content: space-between;
+}
+
+.uploaded-files-panel li .file-name {
+    cursor: pointer;
+    flex: 1;
+}
+
+.uploaded-files-panel li .remove-btn {
+    margin-left: 10px;
+    cursor: pointer;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.uploaded-files-panel li .remove-btn:hover {
+    color: #c0392b;
+}
+
+#newChatBtn {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#newChatBtn i {
+    font-size: 16px;
+}
+
+#newChatBtn:hover {
+    background: #2980b9;
+}
+
+body.theme-dark #newChatBtn {
+    background: #2980b9;
+}
+
+body.theme-dark #newChatBtn:hover {
+    background: #1c6394;
 }
