@@ -27,7 +27,7 @@ class MilvusConfig:
                         analyzer_params=analyzer_params,
                         enable_match=True,  # Enable text matching
                         enable_analyzer=True),
-            FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=768),
+            FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=config.EMBEDDING_DIM),
             FieldSchema(name="sparse_vector", dtype=DataType.SPARSE_FLOAT_VECTOR),
             FieldSchema(name="metadata", dtype=DataType.JSON, is_nullable=True)
         ],

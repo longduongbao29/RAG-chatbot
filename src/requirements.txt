@@ -16,3 +16,4 @@ python-docx
 PyPDF2
 pymilvus[model]
 pymilvus==v2.6.0b0
+langchain-openai
