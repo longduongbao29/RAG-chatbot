@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatbot RAG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="icon" href="assistant.png" type="image/png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="theme-light">
+  <div class="main-container">
+    <!-- Chat Section -->
+    <div class="chat-container">
+      <header>
+        <h1>Chatbot RAG</h1>
+        <button id="newChatBtn"><i class="fas fa-comments"></i> New Chat</button>
+
+
+      </header>
+      <div class="chat-area" id="chatArea"></div>
+      <div class="chatbar">
+        <input type="file" id="fileUploader" style="display: none" />
+        <button class="chatbar-icon left"><i class="fas fa-plus"></i></button>
+        <input type="text" id="chatInput" placeholder="Hỏi bất kỳ điều gì" autocomplete="off" />
+        <div class="chatbar-icons right">
+          <button><i class="fas fa-sliders-h"></i></button>
+          <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Settings Section -->
+    <div class="settings-container">
+      <div class="theme-toggle-wrapper">
+        <label class="switch">
+          <input type="checkbox" id="themeToggleBtn">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <h2>Settings</h2>
+      <div class="setting-group">
+        <label for="providerSelect">Nhà cung cấp:</label>
+        <select id="providerSelect">
+          <option value="groq">Groq</option>
+          <option value="openai">OpenAI</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label for="modelSelect">Mô hình:</label>
+        <select id="modelSelect"></select>
+      </div>
+      <div class="setting-group">
+        <label for="temperatureInput">Temperature:</label>
+        <input type="number" id="temperatureInput" value="0.5" step="0.1" min="0" max="1">
+      </div>
+      <div class="setting-group">
+        <label for="ragStrategySelect">RAG Strategy:</label>
+        <select id="ragStrategySelect">
+          <option value="no_rag">None</option>
+          <option value="self_rag">SelfRAG</option>
+          <option value="c_rag">CRAG</option>
+        </select>
+      </div>
+
+      <div class="uploaded-files-panel">
+        <h3>Tệp đã tải lên</h3>
+        <ul id="uploadedFilesList"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</body>
+
+</html>

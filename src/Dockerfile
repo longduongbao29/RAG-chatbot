@@ -9,9 +9,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Cài pip + build tools cần thiết
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        curl \
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libffi-dev \
+    libssl-dev \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Tận dụng cache pip
@@ -33,10 +36,10 @@ WORKDIR /app
 # Cài đúng package từ wheels đã build
 COPY --from=builder /wheels /wheels
 COPY requirements.txt .
-RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt \
+    && rm -rf /wheels
 
-# Cài thêm nếu cần
-RUN pip install --no-cache-dir hf_xet
+
 
 # Copy source code
 COPY . ./src
@@ -44,4 +47,4 @@ COPY . ./src
 # Expose port
 EXPOSE 8000
 
-CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+CMD ["uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

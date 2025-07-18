@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 from enum import Enum
 # Model cho tài liệu
 class Document(BaseModel):
@@ -14,9 +15,13 @@ class Tool(str,Enum):
     MILVUS_SEARCH = "milvus_search"
     DUCKDUCKGO_SEARCH = "duckduckgo_search"
     DATETIME_TOOL = "datetime_tool"
+class RagStrategy(str,Enum):
+    SELF_RAG = "self_rag"
+    C_RAG = "c_rag"
+    NO_RAG = "no_rag"
 class ChatRequest(BaseModel):
-    use_retrieve: bool = Field(default=False)
-    tools: list[Tool]
+    session_id : str
+    rag_strategy : str = Field(default = "no_rag")
     messages: list = Field(
         ...,
         example=[
@@ -24,6 +29,7 @@ class ChatRequest(BaseModel):
             {"role": "AI", "message": "I'm good, thank you! How can I assist you today?"}
         ]
     )
+    provider : Literal["groq", "openai"]
     model_name: str
     temperature: float
 

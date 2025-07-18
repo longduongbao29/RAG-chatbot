@@ -27,7 +27,7 @@ class MilvusConfig:
                         analyzer_params=analyzer_params,
                         enable_match=True,  # Enable text matching
                         enable_analyzer=True),
-            FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=768),
+            FieldSchema(name="dense_vector", dtype=DataType.FLOAT_VECTOR, dim=config.EMBEDDING_DIM),
             FieldSchema(name="sparse_vector", dtype=DataType.SPARSE_FLOAT_VECTOR),
             FieldSchema(name="metadata", dtype=DataType.JSON, is_nullable=True)
         ],
@@ -70,7 +70,6 @@ class MilvusManager(DbManager):
         """
         Create a collection in Milvus.
         """
-        # logger.info("Creating collection %s in Milvus...", collection_name)
         if not self.client.has_collection(collection_name):
             self.client.create_collection(
                 collection_name=collection_name,
@@ -80,22 +79,26 @@ class MilvusManager(DbManager):
             )
 
             logger.info("Collection %s created successfully.", collection_name)
-        else:
-            logger.warning("Collection %s already exists.", collection_name)
+    def delete_collection(self, collection_name:str):
+        if self.client.has_collection(collection_name):
+            self.client.drop_collection(collection_name=collection_name)
     def index(self, documents: list[Document], collection_name: str):
-        entities = []
+        try:
+            entities = []
 
-        for doc in documents:
-            embedding =  self.embedding_model.embed(text=doc.content)
-            entities.append(
-                {
-                    "content": doc.content,
-                    "dense_vector": embedding,
-                    "metadata": doc.metadata,
-                }
-            )
-        self.client.insert(collection_name, entities)
-
+            for doc in documents:
+                embedding =  self.embedding_model.embed(text=doc.content)
+                entities.append(
+                    {
+                        "content": doc.content,
+                        "dense_vector": embedding,
+                        "metadata": doc.metadata,
+                    }
+                )
+            self.client.insert(collection_name, entities)
+        except Exception as e:
+            logger.error(f"At {__name__}: {e}")
+            raise e
     def fulltext_search(self, collection_name:str, query:str, num_results = 10):
         results = self.client.search(
                 collection_name=collection_name,
@@ -126,7 +129,6 @@ class MilvusManager(DbManager):
         """
         Perform a hybrid search in Milvus.
         """
-        logger.info("Performing hybrid search in collection %s...", collection_name)
         query_embedding = self.embedding_model.embed(text=query)
 
         # Set up BM25 search request
@@ -149,7 +151,8 @@ class MilvusManager(DbManager):
             limit=5,
             output_fields=["content", "metadata"],
         )
-        hybrid_results = results[0]
-
+        hybrid_results = []
+        if results:
+            hybrid_results = results[0]
         return hybrid_results
    

@@ -15,11 +15,17 @@ class Config():
     
     #GROQ
     GROQ_API_KEY = os.getenv("GROQ_API_KEY","")
-    MODEL_NAME = os.getenv("MODEL_NAME","llama-3.3-70b-versatile")
-    TEMPERATURE = os.getenv("TEMPERATURE",0.5)
+    GROQ_MODEL_NAME = os.getenv("MODEL_NAME","llama-3.3-70b-versatile")
+    GROQ_TEMPERATURE = os.getenv("TEMPERATURE",0.5)
     
     #EMBEDDING
     EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME","sentence-transformers/all-mpnet-base-v2")
 
+    #OPENAI
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY","")
+    OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME","gpt-4o-mini")
+    OPENAI_MODEL_TEMPERATURE = os.getenv("OPENAI_MODEL_TEMPERATURE",0.7)
+    OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 
+    EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", 768))
 config = Config()

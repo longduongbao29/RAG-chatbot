@@ -3,14 +3,14 @@ uvicorn
 pytz
 elasticsearch
 injector
-accelerate 
 langchain 
 langchain-groq
 langchain-huggingface 
 langgraph 
-sentence_transformers
 duckduckgo-search
 langchain-community
 python-docx
 PyPDF2
+pymilvus[model]
 pymilvus==v2.6.0b0
+langchain-openai

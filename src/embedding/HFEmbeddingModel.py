@@ -1,4 +1,3 @@
-from venv import logger
 from injector import inject
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 

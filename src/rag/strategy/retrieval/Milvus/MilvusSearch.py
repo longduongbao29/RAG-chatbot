@@ -8,14 +8,16 @@ from src.database.DbManager import DbManager
 from src.rag.strategy.retrieval.Types import SearchStrategy
 from src.rag.strategy.retrieval.VectorSearch import VectorSearch
 from src.utils.logger import setup_logger
+from src.utils.helpers import session2collection
 logger = setup_logger(__name__)
 class MilvusSearch(VectorSearch):
-    def __init__(self, db_manager:DbManager):
+    def __init__(self, db_manager:DbManager, session_id :str):
         """
         Milvus vector search strategy for document retrieval.
         """
         super().__init__()
         self.db_manager = db_manager
+        self.collection_name = session2collection(session= session_id)
     
     def get_documents(self, doc_dict:list[dict])-> list[Document]:
         """
@@ -31,7 +33,7 @@ class MilvusSearch(VectorSearch):
         """
         logger.info("Retrieving documents from Milvus...")
         query: str = kwargs.get("query", "")
-        collection_name = kwargs.get("collection_name", "default_collection")
+        collection_name = self.collection_name
         search_type = kwargs.get("search_type")
         if search_type:
             search_type = SearchStrategy(search_type)
@@ -55,7 +57,6 @@ class MilvusSearch(VectorSearch):
                 docs_results.append(Document(id=doc["id"], content=doc["content"],  metadata=doc.get("metadata", {}),score=doc["distance"]))
          
         elif search_type == SearchStrategy.HYBRID:
-            logger.info("Performing hybrid search...")
             search_results = self.db_manager.hybrid_search(collection_name = collection_name,query = query)
             docs_results = []
             for doc in search_results:
