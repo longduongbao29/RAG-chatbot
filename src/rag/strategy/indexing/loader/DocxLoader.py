@@ -1,5 +1,4 @@
-from docx import Document
-from typing import List, Dict
+
 import os
 
 from src.rag.strategy.indexing.loader.Loader import Loader

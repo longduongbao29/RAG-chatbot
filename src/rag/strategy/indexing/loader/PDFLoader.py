@@ -1,5 +1,4 @@
 import os
-from typing import List, Dict
 from PyPDF2 import PdfReader
 
 from src.rag.strategy.indexing.loader.Loader import Loader
