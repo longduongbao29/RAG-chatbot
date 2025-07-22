@@ -4,6 +4,7 @@ services:
     container_name: chatbot_backend
     ports:
       - ${BACKEND_PORT}:8000
+    restart: unless-stopped
     environment:
       - LANGSMITH_API_KEY=${LANGSMITH_API_KEY}
       - MILVUS_URI=${MILVUS_URI}
@@ -43,6 +44,7 @@ services:
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
     command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
       interval: 30s
@@ -59,6 +61,7 @@ services:
     ports:
       - "9001:9001"
       - "9000:9000"
+    restart: unless-stopped
     volumes:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/minio:/minio_data
     command: minio server /minio_data --console-address ":9001"
@@ -93,23 +96,20 @@ services:
     depends_on:
       - "etcd"
       - "minio"
+    restart: unless-stopped
     networks:
       - chatbot-network
   attu:
     container_name: milvus-attu
     image: zilliz/attu:v2.5
     environment:
-      - MILVUS_URL=localhost:19530
+      - MILVUS_URL=standalone:19530
     ports:
       - "9092:3000"
     depends_on:
       - "standalone"
       - "minio"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9092/health"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+    restart: unless-stopped
     networks:
       - chatbot-network
 networks:
